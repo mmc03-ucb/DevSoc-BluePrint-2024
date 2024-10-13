@@ -47,7 +47,7 @@ function App() {
         >
           <Container maxWidth="lg">
             <Typography variant="body1" align="center">
-              © {new Date().getFullYear()} Interview Prep Hub. All rights reserved.
+              Created by Muqueet and Farhan
             </Typography>
           </Container>
         </Box>

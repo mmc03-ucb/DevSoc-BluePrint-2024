@@ -1,22 +1,37 @@
 import React, { useState } from 'react';
 import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 
 function DynamicLeetCodeList() {
-  const [timeLeft, setTimeLeft] = useState('');
+  const [interviewDate, setInterviewDate] = useState(null);  // Interview date from calendar
   const [prepLevel, setPrepLevel] = useState('');
   const [targetCompany, setTargetCompany] = useState('');
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Calculate number of days between today and the interview date
+  const calculateDaysLeft = () => {
+    if (interviewDate) {
+      const today = dayjs();
+      const daysLeft = interviewDate.diff(today, 'day'); // Get the difference in days
+      return daysLeft >= 0 ? daysLeft : 0; // If negative, return 0
+    }
+    return 0; // If no date is selected, default to 0
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const timeLeft = calculateDaysLeft();
     setLoading(true);
 
     fetch('http://localhost:5001/api/generate-list', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        time_left: parseInt(timeLeft),
+        time_left: timeLeft,
         prep_level: prepLevel,
         target_company: targetCompany
       })
@@ -39,15 +54,17 @@ function DynamicLeetCodeList() {
       </Typography>
 
       <form onSubmit={handleSubmit}>
-        <TextField
-          label="Time Left (days)"
-          type="number"
-          value={timeLeft}
-          onChange={(e) => setTimeLeft(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
+        {/* Interview Date Input */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="When is your interview?"
+            value={interviewDate}
+            onChange={(newValue) => setInterviewDate(newValue)}
+            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+          />
+        </LocalizationProvider>
 
+        {/* Preparation Level Input */}
         <TextField
           label="Preparation Level"
           select
@@ -61,6 +78,7 @@ function DynamicLeetCodeList() {
           <MenuItem value="advanced">Advanced</MenuItem>
         </TextField>
 
+        {/* Target Company Input */}
         <TextField
           label="Target Company (optional)"
           value={targetCompany}
@@ -74,6 +92,7 @@ function DynamicLeetCodeList() {
         </Button>
       </form>
 
+      {/* Display the list of problems */}
       {loading ? (
         <CircularProgress sx={{ mt: 4 }} />
       ) : (

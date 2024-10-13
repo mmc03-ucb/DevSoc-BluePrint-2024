@@ -24,6 +24,12 @@ function getDifficultyScore(difficulty, prepLevel) {
   return scores[prepLevel.toLowerCase()][difficulty];
 }
 
+// Helper function to rank difficulties
+function getDifficultyRank(difficulty) {
+  const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+  return difficultyOrder[difficulty];
+}
+
 // API route to generate a dynamic list based on user input
 app.post('/api/generate-list', (req, res) => {
   const { time_left, prep_level, target_company } = req.body;
@@ -59,12 +65,21 @@ app.post('/api/generate-list', (req, res) => {
     return { ...problem, totalScore };
   });
 
-  // Step 4: Sort and Select Top Problems
-  const sortedProblems = scoredProblems.sort((a, b) => b.totalScore - a.totalScore);
-  const selectedProblems = sortedProblems.slice(0, totalProblems);
+  // Step 4: Sort by total score and select top problems
+  const topProblems = scoredProblems
+    .sort((a, b) => b.totalScore - a.totalScore)
+    .slice(0, totalProblems);
 
-  // Return the selected problems
-  res.json(selectedProblems);
+  // Step 5: Sort the selected problems by difficulty for display
+  const sortedForDisplay = topProblems.sort((a, b) => {
+    const difficultyRankA = getDifficultyRank(a.difficulty);
+    const difficultyRankB = getDifficultyRank(b.difficulty);
+
+    return difficultyRankA - difficultyRankB;  // Sort by difficulty
+  });
+
+  // Return the sorted problems
+  res.json(sortedForDisplay);
 });
 
 // Start the server
