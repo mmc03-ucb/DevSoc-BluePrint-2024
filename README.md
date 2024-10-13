@@ -1,6 +1,7 @@
 # DevSoc BluePrint Hackaathon 2024
 ### Active Tasks (Farhan):
 For each component in src/components, create a landing page with the name of the component in text.Example for dynamic leetcode (already done):
+
 import React from 'react';
 import { Typography, Container } from '@mui/material';
 
