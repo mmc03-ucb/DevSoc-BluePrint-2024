@@ -21,10 +21,12 @@ function DynamicLeetCodeList() {
     </Container>
 
   );
-  
+
 }
 
 export default DynamicLeetCodeList;
+
+From each page, clicking on "Interview Prep Hub" should take me back to landing page
 
 ### General Guidelines:
 
