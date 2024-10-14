@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { getLeetCodeProblems } from '../api'; // Import the updated Firestore API function
+import { getLeetCodeProblems } from '../api'; // Import the Firestore API function
 
 function DynamicLeetCodeList() {
   const [interviewDate, setInterviewDate] = useState(null);  // Interview date from calendar
@@ -12,6 +12,25 @@ function DynamicLeetCodeList() {
   const [targetCompany, setTargetCompany] = useState('');
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false); // Toggle form visibility
+
+  // Fetch all problems on initial load
+  useEffect(() => {
+    const fetchProblems = async () => {
+      setLoading(true);
+      try {
+        // Fetch all problems without personalization
+        const fetchedProblems = await getLeetCodeProblems(1000, 'Beginner'); // No filter initially
+        setProblems(fetchedProblems);
+      } catch (error) {
+        console.error('Error fetching problems:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProblems();
+  }, []);
 
   // Calculate number of days between today and the interview date
   const calculateDaysLeft = () => {
@@ -29,9 +48,10 @@ function DynamicLeetCodeList() {
     setLoading(true);
 
     try {
-      // Fetch processed and sorted problems from the backend (api.js)
+      // Fetch personalized problems from the backend (api.js)
       const fetchedProblems = await getLeetCodeProblems(timeLeft, prepLevel, targetCompany);
-      setProblems(fetchedProblems); // Set the problems to state
+      setProblems(fetchedProblems); // Set the personalized problems to state
+      setShowForm(false); // Hide the form after submission
     } catch (error) {
       console.error('Error fetching problems:', error);
     } finally {
@@ -42,47 +62,61 @@ function DynamicLeetCodeList() {
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" component="h2" align="center" gutterBottom>
-        Generate Your Dynamic LeetCode List
+        Leetcode a day, keeps unemployment away
       </Typography>
 
-      <form onSubmit={handleSubmit}>
-        {/* Interview Date Input */}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="When is your interview?"
-            value={interviewDate}
-            onChange={(newValue) => setInterviewDate(newValue)}
-            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+      {/* Personalize Button */}
+      <Button
+        variant="contained"
+        color="secondary"
+        fullWidth
+        sx={{ mt: 2 }}
+        onClick={() => setShowForm(!showForm)} // Toggle form visibility
+      >
+        {showForm ? 'Hide Personalization' : 'Personalize'}
+      </Button>
+
+      {/* Conditional Form Rendering */}
+      {showForm && (
+        <form onSubmit={handleSubmit} style={{ marginTop: '16px' }}>
+          {/* Interview Date Input */}
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="When is your interview?"
+              value={interviewDate}
+              onChange={(newValue) => setInterviewDate(newValue)}
+              renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+            />
+          </LocalizationProvider>
+
+          {/* Preparation Level Input */}
+          <TextField
+            label="Preparation Level"
+            select
+            value={prepLevel}
+            onChange={(e) => setPrepLevel(e.target.value)}
+            fullWidth
+            margin="normal"
+          >
+            <MenuItem value="beginner">Beginner</MenuItem>
+            <MenuItem value="intermediate">Intermediate</MenuItem>
+            <MenuItem value="advanced">Advanced</MenuItem>
+          </TextField>
+
+          {/* Target Company Input */}
+          <TextField
+            label="Target Company (optional)"
+            value={targetCompany}
+            onChange={(e) => setTargetCompany(e.target.value)}
+            fullWidth
+            margin="normal"
           />
-        </LocalizationProvider>
 
-        {/* Preparation Level Input */}
-        <TextField
-          label="Preparation Level"
-          select
-          value={prepLevel}
-          onChange={(e) => setPrepLevel(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="beginner">Beginner</MenuItem>
-          <MenuItem value="intermediate">Intermediate</MenuItem>
-          <MenuItem value="advanced">Advanced</MenuItem>
-        </TextField>
-
-        {/* Target Company Input */}
-        <TextField
-          label="Target Company (optional)"
-          value={targetCompany}
-          onChange={(e) => setTargetCompany(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-
-        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-          Generate List
-        </Button>
-      </form>
+          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+            Generate Personalized List
+          </Button>
+        </form>
+      )}
 
       {/* Display the list of problems */}
       {loading ? (
