@@ -4,6 +4,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { getLeetCodeProblems } from '../api'; // Import the updated Firestore API function
 
 function DynamicLeetCodeList() {
   const [interviewDate, setInterviewDate] = useState(null);  // Interview date from calendar
@@ -16,35 +17,26 @@ function DynamicLeetCodeList() {
   const calculateDaysLeft = () => {
     if (interviewDate) {
       const today = dayjs();
-      const daysLeft = interviewDate.diff(today, 'day'); // Get the difference in days
+      const daysLeft = interviewDate.diff(today, 'day') + 1; // Get the difference in days
       return daysLeft >= 0 ? daysLeft : 0; // If negative, return 0
     }
     return 0; // If no date is selected, default to 0
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const timeLeft = calculateDaysLeft();
     setLoading(true);
 
-    fetch('http://localhost:5001/api/generate-list', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        time_left: timeLeft,
-        prep_level: prepLevel,
-        target_company: targetCompany
-      })
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setProblems(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      });
+    try {
+      // Fetch processed and sorted problems from the backend (api.js)
+      const fetchedProblems = await getLeetCodeProblems(timeLeft, prepLevel, targetCompany);
+      setProblems(fetchedProblems); // Set the problems to state
+    } catch (error) {
+      console.error('Error fetching problems:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,9 +89,9 @@ function DynamicLeetCodeList() {
         <CircularProgress sx={{ mt: 4 }} />
       ) : (
         <List sx={{ mt: 4 }}>
-          {problems.map((problem) => (
+          {problems.map((problem, index) => (
             <ListItem
-              key={problem.id}
+              key={index}
               component="a"
               href={problem.url}
               target="_blank"
