@@ -1,4 +1,4 @@
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { db } from "./firebase";
 
 // Scoring functions
@@ -22,7 +22,10 @@ export async function getLeetCodeProblems(timeLeft, prepLevel, targetCompany) {
   const q = collection(db, "problems");
 
   const querySnapshot = await getDocs(q);
-  const fetchedProblems = querySnapshot.docs.map((doc) => doc.data());
+  const fetchedProblems = querySnapshot.docs.map((doc) => ({
+    id: doc.id, // Add document ID
+    ...doc.data() // Spread the rest of the document data
+  }));
 
   // Step 1: Estimate Total Problems
   const problemsPerDay = { beginner: 2, intermediate: 4, advanced: 6 };
@@ -69,4 +72,14 @@ export async function getLeetCodeProblems(timeLeft, prepLevel, targetCompany) {
   });
 
   return sortedForDisplay; // Return the sorted problems
+}
+
+// Function to update the completed status of a LeetCode problem in Firestore
+export async function updateProblemCompletionStatus(problemId, isCompleted) {
+  try {
+    const problemRef = doc(db, "problems", problemId); // Reference to the specific problem document
+    await updateDoc(problemRef, { completed: isCompleted }); // Update the 'completed' field
+  } catch (error) {
+    console.error("Error updating completion status:", error);
+  }
 }
