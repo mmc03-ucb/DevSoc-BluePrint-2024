@@ -63,7 +63,14 @@ function CompanyDetails() {
       <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
         Alumni Connections
       </Typography>
-      <Typography variant="body1">
+      <List>
+        {company.taggedAlumni.map((alumni, index) => (
+          <ListItem key={index}>
+            <ListItemText primary={alumni} />
+          </ListItem>
+        ))}
+      </List>
+      <Typography variant="body1" sx={{ mt: 2 }}>
         <a href={company.linkedinLink} target="_blank" rel="noopener noreferrer">
           View UNSW Alumni on LinkedIn
         </a>

@@ -5,6 +5,7 @@ import { AppBar, Toolbar, Typography, Box, Container } from '@mui/material';
 import LandingPage from './components/LandingPage';
 import DynamicLeetCodeList from './components/DynamicLeetCodeList';
 import CompanyOverviews from './components/CompanyOverviews';
+import CompanyDetails from './components/CompanyDetails';
 import GeneralResources from './components/GeneralResources';
 import AlumniConnect from './components/AlumniConnect';
 import JobBoard from './components/JobBoard';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/dynamic-leetcode-list" element={<DynamicLeetCodeList />} />
             <Route path="/company-overviews" element={<CompanyOverviews />} />
+            <Route path="/company-details/:companyId" element={<CompanyDetails />} />
             <Route path="/general-resources" element={<GeneralResources />} />
             <Route path="/alumni-connect" element={<AlumniConnect />} />
             <Route path="/job-board" element={<JobBoard />} />
