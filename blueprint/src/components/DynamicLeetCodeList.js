@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
+import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress, LinearProgress } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -60,6 +60,11 @@ function DynamicLeetCodeList() {
     }
   };
 
+  // Calculate the progress percentage (completed problems / total problems)
+  const totalProblems = problems.length;
+  const completedProblems = problems.filter(problem => problem.completed).length;
+  const progress = totalProblems > 0 ? (completedProblems / totalProblems) * 100 : 0;
+
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" component="h2" align="center" gutterBottom>
@@ -119,44 +124,80 @@ function DynamicLeetCodeList() {
         </form>
       )}
 
+      {/* Display the progress bar */}
+      {totalProblems > 0 && (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '16px', position: 'relative' }}>
+    <div style={{
+      position: 'relative',
+      display: 'inline-flex',
+    }}>
+      {/* Circular Progress Bar */}
+      <CircularProgress 
+        variant="determinate" 
+        value={progress} 
+        size={100}  // Adjust size of the circular progress bar
+        thickness={5}  // Adjust thickness of the circular progress bar
+      />
+      {/* Centered Text */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        textAlign: 'center',
+      }}>
+        <Typography variant="h6" component="div" color="textPrimary">
+          {completedProblems} / {totalProblems}
+        </Typography>
+        <Typography variant="caption" component="div" color="textSecondary">
+          Completed
+        </Typography>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
       {/* Display the list of problems */}
       {loading ? (
-  <CircularProgress sx={{ mt: 4 }} />
-) : (
-  <List sx={{ mt: 4 }}>
-    {problems.map((problem, index) => (
-      <ListItem key={index} button>
-        {/* Checkbox for marking the problem as completed */}
-        <Checkbox
-  checked={problem.completed || false} // Default to false if "completed" does not exist
-  onChange={async (e) => {
-    // Update the completed status locally
-    const updatedProblems = [...problems];
-    updatedProblems[index].completed = e.target.checked;
-    setProblems(updatedProblems);
+        <CircularProgress sx={{ mt: 4 }} />
+      ) : (
+        <List sx={{ mt: 4 }}>
+          {problems.map((problem, index) => (
+            <ListItem key={index} button>
+              {/* Checkbox for marking the problem as completed */}
+              <Checkbox
+                checked={problem.completed || false} // Default to false if "completed" does not exist
+                onChange={async (e) => {
+                  // Update the completed status locally
+                  const updatedProblems = [...problems];
+                  updatedProblems[index].completed = e.target.checked;
+                  setProblems(updatedProblems);
 
-    // Call the function to update the completed status in Firestore
-    await updateProblemCompletionStatus(problem.id, e.target.checked); // Pass the problem ID and the new status
-  }}
-  sx={{
-    color: 'primary.main',
-    '&.Mui-checked': {
-      color: 'primary.main',
-    },
-  }}
-/>
-        <ListItemText
-          primary={
-            <a href={problem.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }} >
-              {problem.title}
-            </a>
-          }
-          secondary={`Difficulty: ${problem.difficulty} | Frequency: ${problem.frequency} | Company Tags: ${problem.company_tags.join(', ')}`}
-        />
-      </ListItem>
-    ))}
-  </List>
-)}
+                  // Call the function to update the completed status in Firestore
+                  await updateProblemCompletionStatus(problem.id, e.target.checked); // Pass the problem ID and the new status
+                }}
+                sx={{
+                  color: 'primary.main',
+                  '&.Mui-checked': {
+                    color: 'primary.main',
+                  },
+                }}
+              />
+              <ListItemText
+                primary={
+                  <a href={problem.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }} >
+                    {problem.title}
+                  </a>
+                }
+                secondary={`Difficulty: ${problem.difficulty} | Frequency: ${problem.frequency} | Company Tags: ${problem.company_tags.join(', ')}`}
+              />
+            </ListItem>
+          ))}
+        </List>
+      )}
     </Container>
   );
 }
