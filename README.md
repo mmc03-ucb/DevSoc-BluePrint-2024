@@ -36,6 +36,7 @@ const extractTitleFromURL = (url) => {
     const title = slug.replace(/-/g, " ");  // Replace hyphens with spaces
     return title.charAt(0).toUpperCase() + title.slice(1);  // Capitalize the first letter
 };
+```
 
 ### General Guidelines:
 
