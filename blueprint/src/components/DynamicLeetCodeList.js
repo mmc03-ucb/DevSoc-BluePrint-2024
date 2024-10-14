@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress, LinearProgress } from '@mui/material';
+import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { getLeetCodeProblems, updateProblemCompletionStatus } from '../api'; // Import the Firestore API function
+import { getLeetCodeProblems, updateProblemCompletionStatus, findProblemByURL, updateProblemContribution, addNewProblem } from '../api'; // Import the Firestore API function
 import { Checkbox } from '@mui/material';
 
 function DynamicLeetCodeList() {
@@ -14,6 +14,12 @@ function DynamicLeetCodeList() {
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false); // Toggle form visibility
+  const [showContributeForm, setShowContributeForm] = useState(false); // Toggle contribute form visibility
+  const [contributeLink, setContributeLink] = useState(''); // Leetcode link for contribution
+  const [contributeCompany, setContributeCompany] = useState(''); // Company for contribution
+  const [contributeDifficulty, setContributeDifficulty] = useState(''); // Add difficulty field
+  const [showDifficultyField, setShowDifficultyField] = useState(false);
+  const [contributeMessage, setContributeMessage] = useState(''); // Message for contribution feedback
 
   // Fetch all problems on initial load
   useEffect(() => {
@@ -65,11 +71,99 @@ function DynamicLeetCodeList() {
   const completedProblems = problems.filter(problem => problem.completed).length;
   const progress = totalProblems > 0 ? (completedProblems / totalProblems) * 100 : 0;
 
+  const extractTitleFromURL = (url) => {
+    const slug = url.split("/problems/")[1].split("/")[0];  // Extract the problem slug
+    const title = slug.replace(/-/g, " ");  // Replace hyphens with spaces
+    return title.charAt(0).toUpperCase() + title.slice(1);  // Capitalize the first letter
+  };
+
+  
+  // Handle contribution
+  const handleContribute = async (e) => {
+  e.preventDefault();
+  setContributeMessage('');  // Clear previous messages
+
+  // Check if the problem exists by URL
+  const existingProblem = await findProblemByURL(contributeLink);
+  
+  if (existingProblem) {
+    // Problem exists, check if the company is tagged
+    if (existingProblem.company_tags.includes(contributeCompany)) {
+      // Company is already tagged, increment the frequency
+      await updateProblemContribution(existingProblem.id, existingProblem.frequency + 1);
+      setContributeMessage('Thank you for contributing!');
+    } else {
+      // Company is not tagged, add the company and set frequency to 1
+      await updateProblemContribution(existingProblem.id, existingProblem.frequency + 1, contributeCompany);
+      setContributeMessage('Thank you for contributing!');
+    }
+
+    // Fetch updated problems and update the state
+    const updatedProblems = await getLeetCodeProblems(1000, 'Beginner');
+    setProblems(updatedProblems);  // Update the problems list in the state
+
+    // Clear input fields and hide the form
+    setContributeLink('');
+    setContributeCompany('');
+    setShowContributeForm(false);  // Hide form after successful contribution
+
+    // Automatically clear the message after 3 seconds
+    setTimeout(() => {
+      setContributeMessage('');
+    }, 3000);
+
+  } else {
+    setShowDifficultyField(true);
+  }
+};
+
+const handleAddNewProblem = async (e) => {
+    e.preventDefault();
+
+    const title = extractTitleFromURL(contributeLink);  // Extract title from URL
+    console.log("Adding new problem with title:", title, "and difficulty:", contributeDifficulty);
+    const newProblem = {
+      url: contributeLink,
+      title,
+      difficulty: contributeDifficulty,
+      frequency: 1,
+      company_tags: [contributeCompany],
+    };
+
+    // Add the new problem to Firestore
+    await addNewProblem(newProblem);
+    setContributeMessage('New problem added successfully!');
+
+    const updatedProblems = await getLeetCodeProblems(1000, 'Beginner');
+    setProblems(updatedProblems);
+    setContributeLink('');
+    setContributeCompany('');
+    setContributeDifficulty('');  // Clear difficulty field
+    setShowContributeForm(false);
+    setShowDifficultyField(false);  // Hide difficulty field after submission
+
+    setTimeout(() => setContributeMessage(''), 3000);
+  };
+
+
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Typography variant="h4" component="h2" align="center" gutterBottom>
-        Leetcode a day, keeps unemployment away
-      </Typography>
+      <Typography
+  variant="h4"
+  component="h2"
+  align="center"
+  gutterBottom
+  sx={{
+    fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',  // Adjust font size between 1rem and 2.5rem based on viewport width
+    whiteSpace: 'nowrap',                    // Prevents the text from wrapping
+    overflow: 'hidden',                      // Ensure no overflow occurs
+    textOverflow: 'clip',                    // No ellipsis, just clip text if needed (though it won't happen with clamp)
+  }}
+>
+  Leetcode a day, keeps unemployment away
+</Typography>
+
+
 
       {/* Personalize Button */}
       <Button
@@ -81,6 +175,77 @@ function DynamicLeetCodeList() {
       >
         {showForm ? 'Hide Personalization' : 'Personalize'}
       </Button>
+
+      {/* Add the "Contribute" Button */}
+      <Button
+  variant="contained"
+  color="primary"
+  fullWidth
+  sx={{ mt: 2 }}
+  onClick={() => {
+    setShowContributeForm(!showContributeForm);  // Toggle contribute form visibility
+    setContributeLink('');  // Clear link field
+    setContributeCompany('');  // Clear company field
+    setContributeMessage('');  // Clear contribution message
+    setShowDifficultyField(false);
+  }}
+>
+  {showContributeForm ? 'Hide Contribution' : 'Contribute'}
+</Button>
+
+
+      {/* Conditional Contribution Form */}
+{showContributeForm && (
+  <form onSubmit={showDifficultyField ? handleAddNewProblem : handleContribute} style={{ marginTop: '16px' }}>
+    {/* Leetcode Link Input */}
+    <TextField
+      label="Leetcode Problem Link"
+      value={contributeLink}
+      onChange={(e) => setContributeLink(e.target.value)}
+      fullWidth
+      margin="normal"
+      required
+    />
+
+    {/* Company Input */}
+    <TextField
+      label="Company"
+      value={contributeCompany}
+      onChange={(e) => setContributeCompany(e.target.value)}
+      fullWidth
+      margin="normal"
+      required
+    />
+
+    {showDifficultyField && (
+      <TextField
+        label="Problem Difficulty"
+        select
+        value={contributeDifficulty}
+        onChange={(e) => setContributeDifficulty(e.target.value)}
+        fullWidth
+        margin="normal"
+        required
+      >
+        <MenuItem value="Easy">Easy</MenuItem>
+        <MenuItem value="Medium">Medium</MenuItem>
+        <MenuItem value="Hard">Hard</MenuItem>
+      </TextField>
+    )}
+
+    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+      {showDifficultyField ? 'Add New Problem' : 'Submit Contribution'}
+    </Button>
+
+    {/* Contribution Message */}
+    {contributeMessage && (
+      <Typography variant="body1" color="success" align="center" sx={{ mt: 2 }}>
+        {contributeMessage}
+      </Typography>
+    )}
+  </form>
+)}
+
 
       {/* Conditional Form Rendering */}
       {showForm && (
@@ -162,9 +327,9 @@ function DynamicLeetCodeList() {
 
       {/* Display the list of problems */}
       {loading ? (
-        <CircularProgress sx={{ mt: 4 }} />
+        <CircularProgress sx={{ mt: 1 }} />
       ) : (
-        <List sx={{ mt: 4 }}>
+        <List sx={{ mt: 1 }}>
           {problems.map((problem, index) => (
             <ListItem key={index} button>
               {/* Checkbox for marking the problem as completed */}

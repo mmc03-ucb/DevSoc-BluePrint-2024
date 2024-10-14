@@ -1,4 +1,4 @@
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, query, where, updateDoc, doc, arrayUnion, addDoc } from "firebase/firestore";
 import { db } from "./firebase";
 
 // Scoring functions
@@ -33,15 +33,15 @@ export async function getLeetCodeProblems(timeLeft, prepLevel, targetCompany) {
 
   // Step 2: Define Weights
   let weights = {
-    w_f: 0.4,
-    w_c: 0.3, // Higher weight for problems tagged with target company
+    w_f: 0.3,
+    w_c: 0.4, // Higher weight for problems tagged with target company
     w_d: 0.2,
     w_t: 0.1
   };
 
   if (timeLeft < 7) {
-    weights.w_f = 0.5;
-    weights.w_c = 0.4;
+    weights.w_f = 0.4;
+    weights.w_c = 0.5;
   }
 
   // Step 3: Calculate Scores for Each Problem
@@ -81,5 +81,37 @@ export async function updateProblemCompletionStatus(problemId, isCompleted) {
     await updateDoc(problemRef, { completed: isCompleted }); // Update the 'completed' field
   } catch (error) {
     console.error("Error updating completion status:", error);
+  }
+}
+
+// Function to find a problem by URL
+export async function findProblemByURL(url) {
+  const q = query(collection(db, "problems"), where("url", "==", url));
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
+  }
+  return null;  // Return null if problem is not found
+}
+
+// Function to update the problem contribution
+export async function updateProblemContribution(problemId, frequency, newCompany = null) {
+  const problemRef = doc(db, "problems", problemId);
+  const updateData = { frequency };
+  if (newCompany) {
+    // Use Firestore's arrayUnion to add the new company to the existing company_tags array
+    updateData.company_tags = arrayUnion(newCompany);  
+  }
+  await updateDoc(problemRef, updateData);
+}
+
+// Function to add a new problem to Firestore
+export async function addNewProblem(problemData) {
+  try {
+    const problemsRef = collection(db, "problems");  // Reference to 'problems' collection
+    await addDoc(problemsRef, problemData);  // Add the new problem to Firestore
+    console.log("Problem added successfully:", problemData);
+  } catch (error) {
+    console.error("Error adding new problem:", error);
   }
 }
