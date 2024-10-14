@@ -1,32 +1,41 @@
 # DevSoc BluePrint Hackaathon 2024
 ### Active Tasks (Farhan):
-For each component in src/components, create a landing page with the name of the component in text.Example for dynamic leetcode (already done):
+### 1. URL Trimming
+When a LeetCode URL is inserted, e.g.  
+`https://leetcode.com/problems/populating-next-right-pointers-in-each-node/description/`  
+Automatically trim the `/description/` part.  
+The resulting URL should be:  
+`https://leetcode.com/problems/populating-next-right-pointers-in-each-node/`
 
-import React from 'react';
+### 2. Relevant Code for Trimming:
 
-import { Typography, Container } from '@mui/material';
+```jsx
+{/* Conditional Contribution Form */}
+{showContributeForm && (
+  <form onSubmit={showDifficultyField ? handleAddNewProblem : handleContribute} style={{ marginTop: '16px' }}>
+    {/* Leetcode Link Input */}
+    <TextField
+      label="Leetcode Problem Link"
+      value={contributeLink}
+      onChange={(e) => setContributeLink(e.target.value)}
+      fullWidth
+      margin="normal"
+      required
+    />
+  </form>
+)}
+```
 
-function DynamicLeetCodeList() {
+### 3. Title Extraction from URL
+When extracting the title from the URL, ensure each word starts with a capital letter.
 
-  return (
-
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-
-      <Typography variant="h4" component="h2" align="center">
-
-        Dynamic LeetCode List
-
-      </Typography>
-
-    </Container>
-
-  );
-
-}
-
-export default DynamicLeetCodeList;
-
-From each page, clicking on "Interview Prep Hub" should take me back to landing page
+#### Relevant Code for Title Extraction:
+```javascript
+const extractTitleFromURL = (url) => {
+    const slug = url.split("/problems/")[1].split("/")[0];  // Extract the problem slug
+    const title = slug.replace(/-/g, " ");  // Replace hyphens with spaces
+    return title.charAt(0).toUpperCase() + title.slice(1);  // Capitalize the first letter
+};
 
 ### General Guidelines:
 
