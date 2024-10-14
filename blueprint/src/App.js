@@ -1,6 +1,5 @@
-// src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Box, Container } from '@mui/material';
 import LandingPage from './components/LandingPage';
 import DynamicLeetCodeList from './components/DynamicLeetCodeList';
@@ -17,7 +16,7 @@ function App() {
         {/* AppBar/Header */}
         <AppBar position="static" color="primary">
           <Toolbar>
-            <Typography variant="h6" component="div">
+            <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit', textTransform: 'none' }}>
               Interview Prep Hub
             </Typography>
           </Toolbar>

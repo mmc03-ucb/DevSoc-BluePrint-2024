@@ -7,9 +7,11 @@ function CompanyOverviews() {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ textAlign: 'center', mb: 5 }}>
-        <Typography variant="h4" component="h2" gutterBottom>
-          Company Overviews
-        </Typography>
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Typography variant="h4" gutterBottom>
+            Interview Prep Hub
+          </Typography>
+        </Link>
         <Typography variant="h6" color="textSecondary">
           Learn more about companies, their culture, tech stack, and connect with alumni.
         </Typography>
