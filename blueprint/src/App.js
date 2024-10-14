@@ -1,7 +1,7 @@
-// src/App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Box, Container, CssBaseline, Switch, IconButton } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
 import LandingPage from './components/LandingPage';
@@ -36,9 +36,7 @@ function App() {
           {/* AppBar/Header */}
           <AppBar position="static" color="primary">
             <Toolbar sx={{ justifyContent: 'space-between' }}>
-              <Typography variant="h6" component="div">
-                Interview Prep Hub
-              </Typography>
+              <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit', textTransform: 'none' }}>Interview Prep Hub</Typography>
               {/* Dark Mode Toggle Switch */}
               <Box display="flex" alignItems="center">
                 <IconButton color="inherit" onClick={handleThemeChange}>
