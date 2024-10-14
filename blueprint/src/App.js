@@ -13,7 +13,8 @@ import AlumniConnect from './components/AlumniConnect';
 import JobBoard from './components/JobBoard';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const [darkMode, setDarkMode] = useState(prefersDarkMode);
 
   // Toggle between light and dark mode
   const handleThemeChange = () => {
