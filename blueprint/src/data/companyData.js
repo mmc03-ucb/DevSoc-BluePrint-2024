@@ -2,7 +2,7 @@ export const companyData = [
   {
     id: 1,
     name: 'Google',
-    icon: 'google.png',
+    icon: '/google.png',
     techStack: ['JavaScript', 'Python', 'Go'],
     payAndPerks: 'Competitive salary, healthcare, stock options',
     recruiters: ['Alice Johnson', 'Bob Smith'],
