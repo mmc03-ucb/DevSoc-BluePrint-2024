@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, Modal, Box, Grid, Typography, Switch, Avatar, Container } from '@mui/material';
+import { Button, TextField, Modal, Box, Grid, Typography, Switch, Avatar, Container, MenuItem } from '@mui/material';
 import { uploadAlumniData, getAlumniList, uploadFileToFirebase } from '../api';
 
 function AlumniConnect() {
-  const [alumniList, setAlumniList] = useState([]);
+  const [alumniList, setAlumniList] = useState([]);  // Alumni list from the backend
+  const [filteredAlumni, setFilteredAlumni] = useState([]);  // Filtered alumni list based on company
+  const [companies, setCompanies] = useState([]);  // List of companies from alumni data
+  const [selectedCompany, setSelectedCompany] = useState('');  // Selected company filter
   const [showSignupForm, setShowSignupForm] = useState(false);
   const [errors, setErrors] = useState({});
   const [alumniData, setAlumniData] = useState({
@@ -22,6 +25,11 @@ function AlumniConnect() {
     const fetchAlumni = async () => {
       const data = await getAlumniList();
       setAlumniList(data);
+      setFilteredAlumni(data);
+
+      // Extract unique companies from the alumni list
+      const uniqueCompanies = [...new Set(data.map(alumni => alumni.company))];
+      setCompanies(uniqueCompanies);
     };
 
     fetchAlumni();
@@ -89,26 +97,60 @@ function AlumniConnect() {
 
       const updatedAlumniList = await getAlumniList();
       setAlumniList(updatedAlumniList);
+      setFilteredAlumni(updatedAlumniList);
     } catch (error) {
       console.error("Error submitting the form:", error);
     }
   };
 
+  // Filter alumni list by selected company
+  const handleCompanyFilter = (e) => {
+    const company = e.target.value;
+    setSelectedCompany(company);
+
+    if (company === '') {
+      setFilteredAlumni(alumniList);  // If no company is selected, show all alumni
+    } else {
+      const filtered = alumniList.filter(alumni => alumni.company === company);
+      setFilteredAlumni(filtered);
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ padding: 4 }}>
-      <Typography variant="h4" component="h1" align="center" gutterBottom>
-        Alumni Connect
-      </Typography>
+     <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',  // Center align horizontally
+      alignItems: 'center',      // Center align vertically
+    }}
+  >
+    {/* Alumni Signup Button */}
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => setShowSignupForm(true)}
+      sx={{ marginBottom: 1 }}
+    >
+      Alumni Signup
+    </Button>
+  </Box>
 
-      {/* Alumni Signup Button */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setShowSignupForm(true)}
-        sx={{ marginBottom: 4 }}
+      {/* Company Filter */}
+      <TextField
+        select
+        label="Filter by Company"
+        value={selectedCompany}
+        onChange={handleCompanyFilter}
+        fullWidth
       >
-        Alumni Signup
-      </Button>
+        <MenuItem value="">All Companies</MenuItem>
+        {companies.map((company, index) => (
+          <MenuItem key={index} value={company}>
+            {company}
+          </MenuItem>
+        ))}
+      </TextField>
 
       {/* Signup Form Modal */}
       <Modal open={showSignupForm} onClose={() => setShowSignupForm(false)}>
@@ -210,7 +252,7 @@ function AlumniConnect() {
 
       {/* Alumni Grid */}
       <Grid container spacing={4} sx={{ marginTop: 4 }}>
-        {alumniList.map((alumni, index) => (
+        {filteredAlumni.map((alumni, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Box
               sx={{
