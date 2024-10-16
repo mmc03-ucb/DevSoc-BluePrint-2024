@@ -1,5 +1,7 @@
 import { collection, getDocs, query, where, updateDoc, doc, arrayUnion, addDoc } from "firebase/firestore";
 import { db } from "./firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage
+import { v4 as uuidv4 } from "uuid";
 
 // Scoring functions
 function getDifficultyScore(difficulty, prepLevel) {
@@ -115,3 +117,63 @@ export async function addNewProblem(problemData) {
     console.error("Error adding new problem:", error);
   }
 }
+
+// Upload Alumni Data
+export async function uploadAlumniData(alumniData) {
+  try {
+    const alumniRef = collection(db, "alumni");
+    await addDoc(alumniRef, alumniData);  // Make sure the correct structure is being uploaded
+    console.log("Alumni data uploaded successfully:", alumniData);  // Log for debugging
+  } catch (error) {
+    console.error("Error uploading alumni data:", error);
+  }
+}
+
+
+// Get Alumni List
+export async function getAlumniList() {
+  try {
+    const alumniRef = collection(db, "alumni");
+    const snapshot = await getDocs(alumniRef);
+    return snapshot.docs.map(doc => doc.data());
+  } catch (error) {
+    console.error("Error fetching alumni data:", error);
+    return [];
+  }
+}
+
+// Function to handle file upload to Firebase Storage and return the URL
+export async function handleFileUpload(file) {
+  try {
+    const storage = getStorage();  // Initialize Firebase Storage
+    const fileName = `${uuidv4()}-${file.name}`;  // Generate a unique file name using UUID
+    const storageRef = ref(storage, `alumni_pictures/${fileName}`);
+
+    // Upload the file to Firebase Storage
+    await uploadBytes(storageRef, file);
+    
+    // Get the download URL
+    const downloadURL = await getDownloadURL(storageRef);
+
+    return { url: downloadURL };  // Return the URL to the frontend
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+}
+
+// Example backend API function to handle file upload from the frontend
+export async function uploadFileToFirebase(formData) {
+  try {
+    const file = formData.get('file');  // Get the file from the formData
+
+    // Call the handleFileUpload function and return the result (URL)
+    const uploadResult = await handleFileUpload(file);
+
+    return uploadResult;  // This should return the download URL to the frontend
+  } catch (error) {
+    console.error("Error in uploadFileToFirebase:", error);
+    throw error;
+  }
+}
+
