@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, Modal, Box, Grid, Typography, Switch, Avatar, Container, MenuItem } from '@mui/material';
+import { Button, TextField, Modal, Box, Grid, Typography, Switch, Avatar, Container, MenuItem, useTheme } from '@mui/material';
 import { uploadAlumniData, getAlumniList, uploadFileToFirebase } from '../api';
 
 function AlumniConnect() {
@@ -20,6 +20,8 @@ function AlumniConnect() {
     picture: null,
     linkedinLink: ''
   });
+
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchAlumni = async () => {
@@ -296,7 +298,7 @@ function AlumniConnect() {
                 borderRadius: 2,
                 boxShadow: 3,
                 textAlign: 'center',
-                backgroundColor: '#f9f9f9',
+                backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#f9f9f9',  // Adjust background for dark mode
                 transition: 'transform 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
@@ -309,16 +311,20 @@ function AlumniConnect() {
                 alt={alumni.name}
                 sx={{ width: 80, height: 80, margin: '0 auto', marginBottom: 2 }}
               />
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
                 {alumni.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 1 }}>
+              <Typography variant="body2" sx={{ color: theme.palette.text.secondary, marginBottom: 1 }}>
                 {alumni.company}
               </Typography>
-              <Typography variant="body2" sx={{ marginBottom: 2 }}>
+              <Typography variant="body2" sx={{ color: theme.palette.text.primary, marginBottom: 2 }}>
                 {alumni.advice}
               </Typography>
-              {alumni.showEmail && <Typography variant="body2">{alumni.email}</Typography>}
+              {alumni.showEmail && (
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+                  {alumni.email}
+                </Typography>
+              )}
               {alumni.showCalendly && (
                 <Button
                   variant="outlined"
