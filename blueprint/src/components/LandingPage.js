@@ -51,9 +51,9 @@ function LandingPage() {
 
   const features = [
     { name: 'Dynamic LeetCode List', path: '/dynamic-leetcode-list', icon: <ListAlt /> },
+    { name: 'Alumni Connect', path: '/alumni-connect', icon: <People /> },
     { name: 'Company Overviews', path: '/company-overviews', icon: <Business /> },
     { name: 'General Resources', path: '/general-resources', icon: <Book /> },
-    { name: 'Alumni Connect', path: '/alumni-connect', icon: <People /> },
     { name: 'Job Board', path: '/job-board', icon: <Work /> },
   ];
 

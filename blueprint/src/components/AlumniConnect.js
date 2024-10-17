@@ -118,23 +118,32 @@ function AlumniConnect() {
 
   return (
     <Container maxWidth="lg" sx={{ padding: 4 }}>
-     <Box
-    sx={{
-      display: 'flex',
-      justifyContent: 'center',  // Center align horizontally
-      alignItems: 'center',      // Center align vertically
-    }}
-  >
-    {/* Alumni Signup Button */}
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={() => setShowSignupForm(true)}
-      sx={{ marginBottom: 1 }}
-    >
-      Alumni Signup
-    </Button>
-  </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: 3,
+        }}
+      >
+        {/* Alumni Signup Button */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setShowSignupForm(true)}
+          sx={{
+            padding: '10px 20px',
+            background: 'linear-gradient(90deg, #1976d2, #004ba0)',
+            borderRadius: 2,
+            boxShadow: 3,
+            '&:hover': {
+              background: 'linear-gradient(90deg, #004ba0, #1976d2)',
+            },
+          }}
+        >
+          Alumni Signup
+        </Button>
+      </Box>
 
       {/* Company Filter */}
       <TextField
@@ -143,6 +152,8 @@ function AlumniConnect() {
         value={selectedCompany}
         onChange={handleCompanyFilter}
         fullWidth
+        variant="outlined"
+        sx={{ marginBottom: 3 }}
       >
         <MenuItem value="">All Companies</MenuItem>
         {companies.map((company, index) => (
@@ -155,7 +166,7 @@ function AlumniConnect() {
       {/* Signup Form Modal */}
       <Modal open={showSignupForm} onClose={() => setShowSignupForm(false)}>
         <Box sx={{ padding: 4, backgroundColor: 'white', margin: 'auto', width: 400, boxShadow: 3, borderRadius: 2 }}>
-          <Typography variant="h5" component="h2" gutterBottom>
+          <Typography variant="h5" component="h2" gutterBottom align="center" sx={{ color: 'primary.main' }}>
             Alumni Signup
           </Typography>
 
@@ -168,6 +179,7 @@ function AlumniConnect() {
               fullWidth
               margin="normal"
               required
+              variant="outlined"
             />
 
             <TextField
@@ -180,14 +192,17 @@ function AlumniConnect() {
               fullWidth
               margin="normal"
               required
+              variant="outlined"
             />
 
-            <Switch
-              checked={alumniData.showEmail}
-              onChange={() => setAlumniData({ ...alumniData, showEmail: !alumniData.showEmail })}
-              name="showEmail"
-            />
-            <Typography variant="body2">Show Email</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
+              <Switch
+                checked={alumniData.showEmail}
+                onChange={() => setAlumniData({ ...alumniData, showEmail: !alumniData.showEmail })}
+                name="showEmail"
+              />
+              <Typography variant="body2">Show Email</Typography>
+            </Box>
 
             <TextField
               label="Company"
@@ -197,6 +212,7 @@ function AlumniConnect() {
               fullWidth
               margin="normal"
               required
+              variant="outlined"
             />
 
             <TextField
@@ -208,6 +224,7 @@ function AlumniConnect() {
               multiline
               rows={4}
               margin="normal"
+              variant="outlined"
             />
 
             <Button variant="contained" component="label" fullWidth sx={{ marginTop: 2 }}>
@@ -224,13 +241,16 @@ function AlumniConnect() {
               helperText={errors.calendlyLink}
               fullWidth
               margin="normal"
+              variant="outlined"
             />
-            <Switch
-              checked={alumniData.showCalendly}
-              onChange={() => setAlumniData({ ...alumniData, showCalendly: !alumniData.showCalendly })}
-              name="showCalendly"
-            />
-            <Typography variant="body2">Show Calendly Link</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
+              <Switch
+                checked={alumniData.showCalendly}
+                onChange={() => setAlumniData({ ...alumniData, showCalendly: !alumniData.showCalendly })}
+                name="showCalendly"
+              />
+              <Typography variant="body2">Show Calendly Link</Typography>
+            </Box>
 
             <TextField
               label="LinkedIn Link"
@@ -241,9 +261,10 @@ function AlumniConnect() {
               helperText={errors.linkedinLink}
               fullWidth
               margin="normal"
+              variant="outlined"
             />
 
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }}>
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 3 }}>
               Submit
             </Button>
           </form>
@@ -257,7 +278,6 @@ function AlumniConnect() {
             <Box
               sx={{
                 padding: 3,
-                border: '1px solid #ddd',
                 borderRadius: 2,
                 boxShadow: 3,
                 textAlign: 'center',
@@ -265,7 +285,8 @@ function AlumniConnect() {
                 transition: 'transform 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
-                }
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                },
               }}
             >
               <Avatar
@@ -273,9 +294,15 @@ function AlumniConnect() {
                 alt={alumni.name}
                 sx={{ width: 80, height: 80, margin: '0 auto', marginBottom: 2 }}
               />
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{alumni.name}</Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 1 }}>{alumni.company}</Typography>
-              <Typography variant="body2" sx={{ marginBottom: 2 }}>{alumni.advice}</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                {alumni.name}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: 1 }}>
+                {alumni.company}
+              </Typography>
+              <Typography variant="body2" sx={{ marginBottom: 2 }}>
+                {alumni.advice}
+              </Typography>
               {alumni.showEmail && <Typography variant="body2">{alumni.email}</Typography>}
               {alumni.showCalendly && (
                 <Button

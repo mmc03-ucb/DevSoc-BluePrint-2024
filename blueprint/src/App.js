@@ -54,10 +54,10 @@ function App() {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'LeetCode List', path: '/dynamic-leetcode-list' },
+    { name: 'Dynamic Leetcode', path: '/dynamic-leetcode-list' },
+    { name: 'Alumni', path: '/alumni-connect' },
     { name: 'Companies', path: '/company-overviews' },
     { name: 'Resources', path: '/general-resources' },
-    { name: 'Alumni', path: '/alumni-connect' },
     { name: 'Jobs', path: '/job-board' },
   ];
 
