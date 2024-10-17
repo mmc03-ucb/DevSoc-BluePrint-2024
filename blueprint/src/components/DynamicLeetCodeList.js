@@ -39,6 +39,20 @@ function DynamicLeetCodeList() {
     fetchProblems();
   }, []);
 
+  // Helper function to trim the URL
+  const trimLeetCodeURL = (url) => {
+    if (url.includes('/description/')) {
+      return url.replace('/description/', '');
+    }
+    return url;
+  };
+
+  // Modified onChange for contributeLink to trim the URL
+  const handleContributeLinkChange = (e) => {
+    const trimmedURL = trimLeetCodeURL(e.target.value);
+    setContributeLink(trimmedURL);
+  };
+
   // Calculate number of days between today and the interview date
   const calculateDaysLeft = () => {
     if (interviewDate) {
@@ -73,51 +87,53 @@ function DynamicLeetCodeList() {
 
   const extractTitleFromURL = (url) => {
     const slug = url.split("/problems/")[1].split("/")[0];  // Extract the problem slug
-    const title = slug.replace(/-/g, " ");  // Replace hyphens with spaces
-    return title.charAt(0).toUpperCase() + title.slice(1);  // Capitalize the first letter
+    const title = slug
+      .split("-")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");  // Capitalize each word
+    return title;
   };
 
-  
   // Handle contribution
   const handleContribute = async (e) => {
-  e.preventDefault();
-  setContributeMessage('');  // Clear previous messages
+    e.preventDefault();
+    setContributeMessage('');  // Clear previous messages
 
-  // Check if the problem exists by URL
-  const existingProblem = await findProblemByURL(contributeLink);
-  
-  if (existingProblem) {
-    // Problem exists, check if the company is tagged
-    if (existingProblem.company_tags.includes(contributeCompany)) {
-      // Company is already tagged, increment the frequency
-      await updateProblemContribution(existingProblem.id, existingProblem.frequency + 1);
-      setContributeMessage('Thank you for contributing!');
+    // Check if the problem exists by URL
+    const existingProblem = await findProblemByURL(contributeLink);
+
+    if (existingProblem) {
+      // Problem exists, check if the company is tagged
+      if (existingProblem.company_tags.includes(contributeCompany)) {
+        // Company is already tagged, increment the frequency
+        await updateProblemContribution(existingProblem.id, existingProblem.frequency + 1);
+        setContributeMessage('Thank you for contributing!');
+      } else {
+        // Company is not tagged, add the company and set frequency to 1
+        await updateProblemContribution(existingProblem.id, existingProblem.frequency + 1, contributeCompany);
+        setContributeMessage('Thank you for contributing!');
+      }
+
+      // Fetch updated problems and update the state
+      const updatedProblems = await getLeetCodeProblems(1000, 'Beginner');
+      setProblems(updatedProblems);  // Update the problems list in the state
+
+      // Clear input fields and hide the form
+      setContributeLink('');
+      setContributeCompany('');
+      setShowContributeForm(false);  // Hide form after successful contribution
+
+      // Automatically clear the message after 3 seconds
+      setTimeout(() => {
+        setContributeMessage('');
+      }, 3000);
+
     } else {
-      // Company is not tagged, add the company and set frequency to 1
-      await updateProblemContribution(existingProblem.id, existingProblem.frequency + 1, contributeCompany);
-      setContributeMessage('Thank you for contributing!');
+      setShowDifficultyField(true);
     }
+  };
 
-    // Fetch updated problems and update the state
-    const updatedProblems = await getLeetCodeProblems(1000, 'Beginner');
-    setProblems(updatedProblems);  // Update the problems list in the state
-
-    // Clear input fields and hide the form
-    setContributeLink('');
-    setContributeCompany('');
-    setShowContributeForm(false);  // Hide form after successful contribution
-
-    // Automatically clear the message after 3 seconds
-    setTimeout(() => {
-      setContributeMessage('');
-    }, 3000);
-
-  } else {
-    setShowDifficultyField(true);
-  }
-};
-
-const handleAddNewProblem = async (e) => {
+  const handleAddNewProblem = async (e) => {
     e.preventDefault();
 
     const title = extractTitleFromURL(contributeLink);  // Extract title from URL
@@ -145,25 +161,22 @@ const handleAddNewProblem = async (e) => {
     setTimeout(() => setContributeMessage(''), 3000);
   };
 
-
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography
-  variant="h4"
-  component="h2"
-  align="center"
-  gutterBottom
-  sx={{
-    fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',  // Adjust font size between 1rem and 2.5rem based on viewport width
-    whiteSpace: 'nowrap',                    // Prevents the text from wrapping
-    overflow: 'hidden',                      // Ensure no overflow occurs
-    textOverflow: 'clip',                    // No ellipsis, just clip text if needed (though it won't happen with clamp)
-  }}
->
-  Leetcode a day, keeps unemployment away
-</Typography>
-
-
+        variant="h4"
+        component="h2"
+        align="center"
+        gutterBottom
+        sx={{
+          fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',  // Adjust font size between 1rem and 2.5rem based on viewport width
+          whiteSpace: 'nowrap',                    // Prevents the text from wrapping
+          overflow: 'hidden',                      // Ensure no overflow occurs
+          textOverflow: 'clip',                    // No ellipsis, just clip text if needed (though it won't happen with clamp)
+        }}
+      >
+        Leetcode a day, keeps unemployment away
+      </Typography>
 
       {/* Personalize Button */}
       <Button
@@ -178,74 +191,72 @@ const handleAddNewProblem = async (e) => {
 
       {/* Add the "Contribute" Button */}
       <Button
-  variant="contained"
-  color="primary"
-  fullWidth
-  sx={{ mt: 2 }}
-  onClick={() => {
-    setShowContributeForm(!showContributeForm);  // Toggle contribute form visibility
-    setContributeLink('');  // Clear link field
-    setContributeCompany('');  // Clear company field
-    setContributeMessage('');  // Clear contribution message
-    setShowDifficultyField(false);
-  }}
->
-  {showContributeForm ? 'Hide Contribution' : 'Contribute'}
-</Button>
-
+        variant="contained"
+        color="primary"
+        fullWidth
+        sx={{ mt: 2 }}
+        onClick={() => {
+          setShowContributeForm(!showContributeForm);  // Toggle contribute form visibility
+          setContributeLink('');  // Clear link field
+          setContributeCompany('');  // Clear company field
+          setContributeMessage('');  // Clear contribution message
+          setShowDifficultyField(false);
+        }}
+      >
+        {showContributeForm ? 'Hide Contribution' : 'Contribute'}
+      </Button>
 
       {/* Conditional Contribution Form */}
-{showContributeForm && (
-  <form onSubmit={showDifficultyField ? handleAddNewProblem : handleContribute} style={{ marginTop: '16px' }}>
-    {/* Leetcode Link Input */}
-    <TextField
-      label="Leetcode Problem Link"
-      value={contributeLink}
-      onChange={(e) => setContributeLink(e.target.value)}
-      fullWidth
-      margin="normal"
-      required
-    />
+      {showContributeForm && (
+        <form onSubmit={showDifficultyField ? handleAddNewProblem : handleContribute} style={{ marginTop: '16px' }}>
+          {/* Leetcode Link Input with URL trimming */}
+          <TextField
+            label="Leetcode Problem Link"
+            value={contributeLink}
+            onChange={handleContributeLinkChange}
+            fullWidth
+            margin="normal"
+            required
+          />
 
-    {/* Company Input */}
-    <TextField
-      label="Company"
-      value={contributeCompany}
-      onChange={(e) => setContributeCompany(e.target.value)}
-      fullWidth
-      margin="normal"
-      required
-    />
+          {/* Company Input */}
+          <TextField
+            label="Company"
+            value={contributeCompany}
+            onChange={(e) => setContributeCompany(e.target.value)}
+            fullWidth
+            margin="normal"
+            required
+          />
 
-    {showDifficultyField && (
-      <TextField
-        label="Problem Difficulty"
-        select
-        value={contributeDifficulty}
-        onChange={(e) => setContributeDifficulty(e.target.value)}
-        fullWidth
-        margin="normal"
-        required
-      >
-        <MenuItem value="Easy">Easy</MenuItem>
-        <MenuItem value="Medium">Medium</MenuItem>
-        <MenuItem value="Hard">Hard</MenuItem>
-      </TextField>
-    )}
+          {showDifficultyField && (
+            <TextField
+              label="Problem Difficulty"
+              select
+              value={contributeDifficulty}
+              onChange={(e) => setContributeDifficulty(e.target.value)}
+              fullWidth
+              margin="normal"
+              required
+            >
+              <MenuItem value="Easy">Easy</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="Hard">Hard</MenuItem>
+            </TextField>
+          )}
 
-    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-      {showDifficultyField ? 'Add New Problem' : 'Submit Contribution'}
-    </Button>
+          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+            {showDifficultyField ? 'Add New Problem' : 'Submit Contribution'}
+          </Button>
 
-    {/* Contribution Message */}
-    {contributeMessage && (
-      <Typography variant="body1" color="success" align="center" sx={{ mt: 2 }}>
-        {contributeMessage}
-      </Typography>
-    )}
-  </form>
-)}
-
+          {/* Contribution Message */}
+          {contributeMessage && (
+            <Typography variant="body1" color="success" align="center" sx={{ mt: 2 }}>
+              {contributeMessage}
+            </Typography>
+          )}
+        </form>
+      )}
 
       {/* Conditional Form Rendering */}
       {showForm && (
@@ -291,39 +302,36 @@ const handleAddNewProblem = async (e) => {
 
       {/* Display the progress bar */}
       {totalProblems > 0 && (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '16px', position: 'relative' }}>
-    <div style={{
-      position: 'relative',
-      display: 'inline-flex',
-    }}>
-      {/* Circular Progress Bar */}
-      <CircularProgress 
-        variant="determinate" 
-        value={progress} 
-        size={100}  // Adjust size of the circular progress bar
-        thickness={5}  // Adjust thickness of the circular progress bar
-      />
-      {/* Centered Text */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        textAlign: 'center',
-      }}>
-        <Typography variant="h6" component="div" color="textPrimary">
-          {completedProblems} / {totalProblems}
-        </Typography>
-        <Typography variant="caption" component="div" color="textSecondary">
-          Completed
-        </Typography>
-      </div>
-    </div>
-  </div>
-)}
-
-
-
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '16px', position: 'relative' }}>
+          <div style={{
+            position: 'relative',
+            display: 'inline-flex',
+          }}>
+            {/* Circular Progress Bar */}
+            <CircularProgress 
+              variant="determinate" 
+              value={progress} 
+              size={100}  // Adjust size of the circular progress bar
+              thickness={5}  // Adjust thickness of the circular progress bar
+            />
+            {/* Centered Text */}
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+            }}>
+              <Typography variant="h6" component="div" color="textPrimary">
+                {completedProblems} / {totalProblems}
+              </Typography>
+              <Typography variant="caption" component="div" color="textSecondary">
+                Completed
+              </Typography>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Display the list of problems */}
       {loading ? (

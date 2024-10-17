@@ -88,7 +88,8 @@ export async function updateProblemCompletionStatus(problemId, isCompleted) {
 
 // Function to find a problem by URL
 export async function findProblemByURL(url) {
-  const q = query(collection(db, "problems"), where("url", "==", url));
+  const trimmedURL = url.includes('/description/') ? url.replace('/description/', '') : url;
+  const q = query(collection(db, "problems"), where("url", "==", trimmedURL));
   const querySnapshot = await getDocs(q);
   if (!querySnapshot.empty) {
     return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
@@ -110,9 +111,11 @@ export async function updateProblemContribution(problemId, frequency, newCompany
 // Function to add a new problem to Firestore
 export async function addNewProblem(problemData) {
   try {
+    const trimmedURL = problemData.url.includes('/description/') ? problemData.url.replace('/description/', '') : problemData.url;
+    const newProblem = { ...problemData, url: trimmedURL };
     const problemsRef = collection(db, "problems");  // Reference to 'problems' collection
-    await addDoc(problemsRef, problemData);  // Add the new problem to Firestore
-    console.log("Problem added successfully:", problemData);
+    await addDoc(problemsRef, newProblem);  // Add the new problem to Firestore
+    console.log("Problem added successfully:", newProblem);
   } catch (error) {
     console.error("Error adding new problem:", error);
   }
@@ -128,7 +131,6 @@ export async function uploadAlumniData(alumniData) {
     console.error("Error uploading alumni data:", error);
   }
 }
-
 
 // Get Alumni List
 export async function getAlumniList() {
@@ -176,4 +178,3 @@ export async function uploadFileToFirebase(formData) {
     throw error;
   }
 }
-
