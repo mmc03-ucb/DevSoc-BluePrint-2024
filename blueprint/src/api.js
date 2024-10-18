@@ -87,9 +87,8 @@ export async function updateProblemCompletionStatus(problemId, isCompleted) {
 }
 
 // Function to find a problem by URL
-export async function findProblemByURL(url) {
-  const trimmedURL = url.includes('/description/') ? url.replace('/description/', '') : url;
-  const q = query(collection(db, "problems"), where("url", "==", trimmedURL));
+export async function findProblemByTitle(title) {
+  const q = query(collection(db, "problems"), where("title", "==", title));
   const querySnapshot = await getDocs(q);
   if (!querySnapshot.empty) {
     return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };

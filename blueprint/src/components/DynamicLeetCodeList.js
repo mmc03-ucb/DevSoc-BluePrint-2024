@@ -4,7 +4,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { getLeetCodeProblems, updateProblemCompletionStatus, findProblemByURL, updateProblemContribution, addNewProblem, getCompanyOverview } from '../api'; // Import the Firestore API function
+import { getLeetCodeProblems, updateProblemCompletionStatus, findProblemByTitle, updateProblemContribution, addNewProblem, getCompanyOverview } from '../api'; // Import the Firestore API function
 import { Checkbox } from '@mui/material';
 import { Link } from 'react-router-dom';
 
@@ -107,7 +107,8 @@ function DynamicLeetCodeList() {
     setContributeMessage('');  // Clear previous messages
 
     // Check if the problem exists by URL
-    const existingProblem = await findProblemByURL(contributeLink);
+    const t = extractTitleFromURL(contributeLink);
+    const existingProblem = await findProblemByTitle(t);
 
     if (existingProblem) {
       // Problem exists, check if the company is tagged
