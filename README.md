@@ -1,90 +1,90 @@
-# DevSoc BluePrint Hackaathon 2024
-### Active Tasks (Farhan):
-### 1. URL Trimming
-When a LeetCode URL is inserted, e.g.  
-`https://leetcode.com/problems/populating-next-right-pointers-in-each-node/description/`  
-Automatically trim the `/description/` part.  
-The resulting URL should be:  
-`https://leetcode.com/problems/populating-next-right-pointers-in-each-node/`
+# HireVerse - DevSoc Blueprint Hackathon 2024
 
-### 2. Relevant Code for Trimming:
+**Team:**  
+- **Muqueet Mohsen Chowdhury**  
+- **Farhan Bin Masud**
 
-```jsx
-{/* Conditional Contribution Form */}
-{showContributeForm && (
-  <form onSubmit={showDifficultyField ? handleAddNewProblem : handleContribute} style={{ marginTop: '16px' }}>
-    {/* Leetcode Link Input */}
-    <TextField
-      label="Leetcode Problem Link"
-      value={contributeLink}
-      onChange={(e) => setContributeLink(e.target.value)}
-      fullWidth
-      margin="normal"
-      required
-    />
-  </form>
-)}
-```
+Welcome to **HireVerse**, the platform designed to help UNSW students prepare for technical interviews by providing personalized LeetCode problems, connecting with UNSW alumni, and accessing in-depth company insights. This repository contains the source code for our project, developed as part of the DevSoc Blueprint Hackathon 2024.
 
-### 3. Title Extraction from URL
-When extracting the title from the URL, ensure each word starts with a capital letter.
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-#### Relevant Code for Title Extraction:
-```javascript
-const extractTitleFromURL = (url) => {
-    const slug = url.split("/problems/")[1].split("/")[0];  // Extract the problem slug
-    const title = slug.replace(/-/g, " ");  // Replace hyphens with spaces
-    return title.charAt(0).toUpperCase() + title.slice(1);  // Capitalize the first letter
-};
-```
+## Project Overview
 
-### General Guidelines:
+### Problem
+Preparing for technical interviews can be overwhelming. While platforms like LeetCode, Grind75, LinkedIn, and others provide helpful resources, they often fall short in delivering:
+- Free, accessible, and relevant company-tagged problems.
+- Reliable and timely alumni connections for personalized advice and mock interviews.
+- Comprehensive company insights specific to the Australian market.
 
-- Write clean, well-documented code with appropriate comments.
-- Ensure the design is simple, user-friendly, and visually appealing.
+### Solution
+**HireVerse** addresses these challenges by offering:
+- A personalized LeetCode problem list based on target companies, preparation time, and interview dates.
+- An *Alumni Connect* feature that allows students to connect with UNSW alumni for advice, insights, and mock interviews.
+- Detailed company overviews with tech stacks, recruiter contacts, perks, and alumni connections — all for free!
 
-### Task Distribution:
+## Features
+- **Dynamic LeetCode Problem List**  
+  Personalized problem sets based on target company and interview date, with problems tagged by UNSW alumni.
+  
+- **Alumni Connect**  
+  Alumni can voluntarily sign up to provide advice and mock interviews, with options to show/hide Calendly links and email addresses.
 
-1. **Dynamic LeetCode List** - *Muqueet*
-   - Implement a dynamic problem list similar to Grind75.
-   - Tailor suggestions based on time left, company preferences, and current preparation level.
+- **Company Overviews**  
+  In-depth insights on tech stacks, perks, recruiter lists, and alumni connections specific to the Australian market.
 
-2. **Company Overviews** - *Farhan*
-   - Collect and display information on companies:
-     - Name, tech stack, recruiter list.
-     - Pay and perks.
-     - Employee reviews.
-     - Tagged alumni from our list.
-     - General LinkedIn link to see more UNSW alumni in the company.
-     - Tagged questions link/list related to the company.
+## Tech Stack
+- **Frontend:**  
+  - React with Material UI (dark mode, responsive design, accessibility support)
 
-3. **General Resources** - *Farhan*
-   - Compile crowdsourced guides and general advice for:
-     - Resume building.
-     - Interview preparation.
-     - Other job search resources.
+- **Backend:**  
+  - Firebase Firestore (database)  
+  - Firebase Authentication (user management)  
 
-4. **Alumni Connect** - *Muqueet*
-   - Create a signup form for alumni.
-   - Implement status indicators for alumni availability to:
-     - Connect for networking.
-     - Provide mock interviews.
-     - Offer career advice.
+## Installation
 
-5. **Job Board** - *Muqueet*
-   - Build a job posting system with:
-     - Filters for work rights.
-     - Auto-removal of expired listings.
-     - Notifications when new jobs are posted.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/HireVerse.git
+   cd HireVerse
+   ```
 
-6. **Upcoming Events and Competitions** - *Farhan*
-   - Maintain a section that lists relevant events, hackathons, or competitions.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
----
+3. **Set up Firebase:**
+   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
+   - Set up Firestore and Firebase Authentication.
+   - Add your Firebase config file to the project.
 
-### Optional Task:
+4. **Run the application:**
+   ```bash
+   npm start
+   ```
 
-- **Discussion Board** - *Muqueet*
-  - Implement a discussion board where users can engage with one another.
+## Usage
+1. Navigate to the landing page where you can explore:
+   - **Personalized LeetCode List:** Enter target company and interview date to receive a personalized problem list.
+   - **Alumni Connect:** View available alumni, request advice, or schedule mock interviews.
+   - **Company Overviews:** Explore company insights, including tech stacks, perks, and recruiter details.
 
+2. Customize your experience by signing in with your Firebase account to save your progress, bookmark alumni, and access additional features.
 
+## Contributing
+We welcome contributions to make *HireVerse* even better! To contribute:
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature-branch-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature-branch-name`
+5. Open a pull request and describe your changes.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
