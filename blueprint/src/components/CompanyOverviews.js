@@ -21,6 +21,7 @@ import { db, storage } from '../firebase'; // Ensure storage is imported
 
 function CompanyOverviews() {
   const [companyData, setCompanyData] = useState([]);
+  const [filteredCompanies, setFilteredCompanies] = useState([]); // Filtered companies based on search
   const [open, setOpen] = useState(false); // State to control dialog visibility
   const [newCompany, setNewCompany] = useState({
     name: '',
@@ -30,6 +31,7 @@ function CompanyOverviews() {
     employeeReviews: '',
     icon: null, // Updated to handle file
   });
+  const [searchTerm, setSearchTerm] = useState(''); // Search state
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -37,10 +39,22 @@ function CompanyOverviews() {
       const companySnapshot = await getDocs(collection(db, 'companies'));
       const companies = companySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setCompanyData(companies);
+      setFilteredCompanies(companies); // Initially show all companies
     };
 
     fetchCompanies();
   }, []);
+
+  // Handle search input change and filter companies
+  const handleSearchChange = (e) => {
+    const searchValue = e.target.value.toLowerCase();
+    setSearchTerm(searchValue);
+
+    const filtered = companyData.filter((company) =>
+      company.name.toLowerCase().includes(searchValue)
+    );
+    setFilteredCompanies(filtered);
+  };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -81,7 +95,9 @@ function CompanyOverviews() {
 
       // Refresh the company list after adding a new entry
       const updatedCompanies = await getDocs(collection(db, 'companies'));
-      setCompanyData(updatedCompanies.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const companies = updatedCompanies.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setCompanyData(companies);
+      setFilteredCompanies(companies); // Update filtered companies after adding a new one
       handleClose(); // Close dialog
     } catch (error) {
       console.error('Error adding company:', error);
@@ -99,13 +115,24 @@ function CompanyOverviews() {
         <Typography variant="h6" color="textSecondary">
           Learn more about companies, their culture, tech stack, and connect with alumni.
         </Typography>
+
+        {/* Search Bar */}
+        <TextField
+          label="Search Companies"
+          variant="outlined"
+          fullWidth
+          sx={{ mt: 2, mb: 4 }}
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+
         <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mt: 2 }}>
           Add Company
         </Button>
       </Box>
 
       <Grid container spacing={4}>
-        {companyData.map((company) => (
+        {filteredCompanies.map((company) => (
           <Grid item key={company.id} xs={12} sm={6} md={4}>
             <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardActionArea component={Link} to={`/company-details/${company.id}`}>
