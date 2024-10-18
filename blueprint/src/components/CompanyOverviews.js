@@ -16,11 +16,11 @@ import {
   TextField,
 } from '@mui/material';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../firebase'; // Ensure storage is imported
 
 function CompanyOverviews() {
   const [companyData, setCompanyData] = useState([]);
-  const [alumniData, setAlumniData] = useState([]); // Alumni data state
   const [open, setOpen] = useState(false); // State to control dialog visibility
   const [newCompany, setNewCompany] = useState({
     name: '',
@@ -28,8 +28,9 @@ function CompanyOverviews() {
     recruiterList: '',
     payAndPerks: '',
     employeeReviews: '',
-    icon: '',
+    icon: null, // Updated to handle file
   });
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -38,14 +39,7 @@ function CompanyOverviews() {
       setCompanyData(companies);
     };
 
-    const fetchAlumni = async () => {
-      const alumniSnapshot = await getDocs(collection(db, 'alumni'));
-      const alumniList = alumniSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setAlumniData(alumniList);
-    };
-
     fetchCompanies();
-    fetchAlumni();
   }, []);
 
   const handleOpen = () => setOpen(true);
@@ -56,26 +50,44 @@ function CompanyOverviews() {
     setNewCompany((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setNewCompany((prev) => ({ ...prev, icon: file }));
+  };
+
   const handleSubmit = async () => {
     try {
+      setUploading(true);
+
+      // If an icon file is selected, upload it to Firebase Storage
+      let iconURL = '';
+      if (newCompany.icon) {
+        const storageRef = ref(storage, `companyIcons/${new Date().getTime()}_${newCompany.icon.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, newCompany.icon);
+
+        // Wait for the upload to complete
+        const snapshot = await uploadTask;
+        iconURL = await getDownloadURL(snapshot.ref); // Get the download URL for the icon
+      }
+
+      // Add the new company to Firestore with the icon URL
       const formattedCompany = {
         ...newCompany,
+        icon: iconURL, // Store the uploaded icon URL
         techStack: newCompany.techStack.split(',').map((item) => item.trim()),
         recruiterList: newCompany.recruiterList.split(',').map((item) => item.trim()),
       };
       await addDoc(collection(db, 'companies'), formattedCompany);
-      
+
+      // Refresh the company list after adding a new entry
       const updatedCompanies = await getDocs(collection(db, 'companies'));
       setCompanyData(updatedCompanies.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-      handleClose();
+      handleClose(); // Close dialog
     } catch (error) {
       console.error('Error adding company:', error);
+    } finally {
+      setUploading(false);
     }
-  };
-
-  // Helper function to filter alumni based on the company
-  const getCompanyAlumni = (companyName) => {
-    return alumniData.filter((alumni) => alumni.company === companyName);
   };
 
   return (
@@ -114,26 +126,6 @@ function CompanyOverviews() {
                   <Typography variant="body2" color="textSecondary">
                     Employee Reviews: {company.employeeReviews}
                   </Typography>
-
-                  {/* Alumni Section */}
-                  <Typography variant="h6" sx={{ mt: 2 }}>
-                    Alumni
-                  </Typography>
-                  {getCompanyAlumni(company.name).map((alumni) => (
-                    <Box key={alumni.id} sx={{ mb: 1 }}>
-                      <Typography variant="body2">
-                        {alumni.name}
-                      </Typography>
-                      <Button
-                        variant="text"
-                        href={alumni.linkedinLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        LinkedIn
-                      </Button>
-                    </Box>
-                  ))}
                 </CardContent>
               </CardActionArea>
             </Card>
@@ -150,14 +142,21 @@ function CompanyOverviews() {
           <TextField margin="dense" name="recruiterList" label="Recruiters" type="text" fullWidth variant="standard" value={newCompany.recruiterList} onChange={handleChange} />
           <TextField margin="dense" name="payAndPerks" label="Pay and Perks" type="text" fullWidth variant="standard" value={newCompany.payAndPerks} onChange={handleChange} />
           <TextField margin="dense" name="employeeReviews" label="Employee Reviews" type="text" fullWidth variant="standard" value={newCompany.employeeReviews} onChange={handleChange} />
-          <TextField margin="dense" name="icon" label="Icon URL" type="text" fullWidth variant="standard" value={newCompany.icon} onChange={handleChange} />
+
+          {/* File Input for Icon */}
+          <Button variant="contained" component="label" sx={{ mt: 2 }}>
+            Upload Company Icon
+            <input type="file" hidden onChange={handleFileChange} />
+          </Button>
+
+          {uploading && <Typography variant="body2" color="textSecondary">Uploading...</Typography>}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} color="primary">
-            Add
+          <Button onClick={handleSubmit} color="primary" disabled={uploading}>
+            {uploading ? 'Adding...' : 'Add'}
           </Button>
         </DialogActions>
       </Dialog>
