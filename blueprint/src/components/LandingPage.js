@@ -73,7 +73,7 @@ function LandingPage() {
               fontSize: '3rem', // Adjust the size for better readability
             }}
           >
-            Welcome to Interview Prep Hub
+            Welcome to HireVerse
           </Typography>
           <Typography
             variant="h6" // Use a smaller variant for better hierarchy
