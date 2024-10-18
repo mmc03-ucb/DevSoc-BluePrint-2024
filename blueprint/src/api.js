@@ -103,9 +103,8 @@ export async function updateProblemCompletionStatus(problemId, isCompleted) {
 }
 
 // Function to find a problem by URL
-export async function findProblemByURL(url) {
-  const trimmedURL = url.includes('/description/') ? url.replace('/description/', '') : url;
-  const q = query(collection(db, "problems"), where("url", "==", trimmedURL));
+export async function findProblemByTitle(title) {
+  const q = query(collection(db, "problems"), where("title", "==", title));
   const querySnapshot = await getDocs(q);
   if (!querySnapshot.empty) {
     return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
@@ -194,3 +193,21 @@ export async function uploadFileToFirebase(formData) {
     throw error;
   }
 }
+
+// Function to fetch company overview from Firestore
+export async function getCompanyOverview(companyName) {
+  try {
+    const q = query(collection(db, "companies"), where("name", "==", companyName));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const companyDoc = querySnapshot.docs[0];
+      return { id: companyDoc.id, ...companyDoc.data() };
+    }
+    return null;  // Return null if company is not found
+  } catch (error) {
+    console.error("Error fetching company overview:", error);
+    return null;
+  }
+}
+

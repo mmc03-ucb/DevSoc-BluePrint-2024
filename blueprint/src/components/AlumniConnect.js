@@ -173,16 +173,29 @@ function AlumniConnect() {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
+<<<<<<< HEAD
             width: { xs: '90%', sm: '80%', md: '60%', lg: '40%' },  // Responsive width
             maxHeight: '90vh',  // Max height to avoid overflow
             overflowY: 'auto',  // Enable scrolling if content exceeds max height
             padding: 4,
             backgroundColor: 'white',
+=======
+            width: { xs: '90%', sm: '80%', md: '60%', lg: '40%' },
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: 4,
+            backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'white',  // Dynamic background color
+            color: theme.palette.text.primary,  // Dynamic text color
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             boxShadow: 3,
             borderRadius: 2,
           }}
         >
+<<<<<<< HEAD
           <Typography variant="h5" component="h2" gutterBottom align="center" sx={{ color: 'primary.main' }}>
+=======
+          <Typography variant="h5" component="h2" gutterBottom align="center" sx={{ color: theme.palette.primary.main }}>
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             Alumni Signup
           </Typography>
 
@@ -196,6 +209,15 @@ function AlumniConnect() {
               margin="normal"
               required
               variant="outlined"
+<<<<<<< HEAD
+=======
+              InputLabelProps={{
+                style: { color: theme.palette.text.primary },  // Adjust text color
+              }}
+              InputProps={{
+                style: { color: theme.palette.text.primary },  // Adjust input text color
+              }}
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             />
 
             <TextField
@@ -209,6 +231,15 @@ function AlumniConnect() {
               margin="normal"
               required
               variant="outlined"
+<<<<<<< HEAD
+=======
+              InputLabelProps={{
+                style: { color: theme.palette.text.primary },  // Adjust text color
+              }}
+              InputProps={{
+                style: { color: theme.palette.text.primary },  // Adjust input text color
+              }}
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             />
 
             <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
@@ -229,6 +260,15 @@ function AlumniConnect() {
               margin="normal"
               required
               variant="outlined"
+<<<<<<< HEAD
+=======
+              InputLabelProps={{
+                style: { color: theme.palette.text.primary },  // Adjust text color
+              }}
+              InputProps={{
+                style: { color: theme.palette.text.primary },  // Adjust input text color
+              }}
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             />
 
             <TextField
@@ -241,6 +281,15 @@ function AlumniConnect() {
               rows={4}
               margin="normal"
               variant="outlined"
+<<<<<<< HEAD
+=======
+              InputLabelProps={{
+                style: { color: theme.palette.text.primary },  // Adjust text color
+              }}
+              InputProps={{
+                style: { color: theme.palette.text.primary },  // Adjust input text color
+              }}
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             />
 
             <Button variant="contained" component="label" fullWidth sx={{ marginTop: 2 }}>
@@ -258,6 +307,7 @@ function AlumniConnect() {
               fullWidth
               margin="normal"
               variant="outlined"
+<<<<<<< HEAD
             />
             <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
               <Switch
@@ -268,6 +318,25 @@ function AlumniConnect() {
               <Typography variant="body2">Show Calendly Link</Typography>
             </Box>
 
+=======
+              InputLabelProps={{
+                style: { color: theme.palette.text.primary },  // Adjust text color
+              }}
+              InputProps={{
+                style: { color: theme.palette.text.primary },  // Adjust input text color
+              }}
+            />
+
+            <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
+              <Switch
+                checked={alumniData.showCalendly}
+                onChange={() => setAlumniData({ ...alumniData, showCalendly: !alumniData.showCalendly })}
+                name="showCalendly"
+              />
+              <Typography variant="body2">Show Calendly Link</Typography>
+            </Box>
+
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             <TextField
               label="LinkedIn Link"
               name="linkedinLink"
@@ -278,6 +347,15 @@ function AlumniConnect() {
               fullWidth
               margin="normal"
               variant="outlined"
+<<<<<<< HEAD
+=======
+              InputLabelProps={{
+                style: { color: theme.palette.text.primary },  // Adjust text color
+              }}
+              InputProps={{
+                style: { color: theme.palette.text.primary },  // Adjust input text color
+              }}
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
             />
 
             <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 3 }}>
@@ -289,6 +367,7 @@ function AlumniConnect() {
 
       {/* Alumni Grid */}
       <Grid container spacing={4} sx={{ marginTop: 4 }}>
+<<<<<<< HEAD
         {filteredAlumni.map((alumni, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Box
@@ -351,6 +430,74 @@ function AlumniConnect() {
           </Grid>
         ))}
       </Grid>
+=======
+  {filteredAlumni.map((alumni, index) => (
+    <Grid item xs={12} sm={6} md={4} key={index}>
+      <Box
+        sx={{
+          padding: 3,
+          borderRadius: 2,
+          boxShadow: 3,
+          textAlign: 'center',
+          backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#f9f9f9',
+          transition: 'transform 0.3s ease',
+          height: '100%', // Ensure all cards take full height
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between', // Spread content evenly
+          '&:hover': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+          },
+        }}
+      >
+        <Avatar
+          src={alumni.picture || ''}
+          alt={alumni.name}
+          sx={{ width: 80, height: 80, margin: '0 auto', marginBottom: 2 }}
+        />
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
+          {alumni.name}
+        </Typography>
+        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, marginBottom: 1 }}>
+          {alumni.company}
+        </Typography>
+        <Typography variant="body2" sx={{ color: theme.palette.text.primary, marginBottom: 2 }}>
+          {alumni.advice}
+        </Typography>
+        {alumni.showEmail && (
+          <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+            {alumni.email}
+          </Typography>
+        )}
+        {alumni.showCalendly && (
+          <Button
+            variant="outlined"
+            href={alumni.calendlyLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ marginTop: 1 }}
+          >
+            Book a Chat
+          </Button>
+        )}
+        {alumni.linkedinLink && (
+          <Button
+            variant="outlined"
+            href={alumni.linkedinLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ marginTop: 1 }}
+          >
+            View LinkedIn
+          </Button>
+        )}
+      </Box>
+    </Grid>
+  ))}
+</Grid>
+
+>>>>>>> 78f47ba689358efa8140653876b1ed375fd9aff7
     </Container>
   );
 }
