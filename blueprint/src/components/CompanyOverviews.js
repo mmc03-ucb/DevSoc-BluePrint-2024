@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Rating, // Import Rating for star reviews
 } from '@mui/material';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
@@ -24,10 +25,9 @@ function CompanyOverviews() {
   const [open, setOpen] = useState(false); // State to control dialog visibility
   const [newCompany, setNewCompany] = useState({
     name: '',
-    techStack: '',
-    recruiterList: '',
+    recruiterList: '', // Comma-separated string of recruiters and LinkedIn URLs
     payAndPerks: '',
-    employeeReviews: '',
+    employeeReviews: 3, // Default employee review stars
     icon: null, // Updated to handle file
   });
   const [uploading, setUploading] = useState(false);
@@ -55,6 +55,10 @@ function CompanyOverviews() {
     setNewCompany((prev) => ({ ...prev, icon: file }));
   };
 
+  const handleRatingChange = (event, newValue) => {
+    setNewCompany((prev) => ({ ...prev, employeeReviews: newValue }));
+  };
+
   const handleSubmit = async () => {
     try {
       setUploading(true);
@@ -74,8 +78,12 @@ function CompanyOverviews() {
       const formattedCompany = {
         ...newCompany,
         icon: iconURL, // Store the uploaded icon URL
-        techStack: newCompany.techStack.split(',').map((item) => item.trim()),
-        recruiterList: newCompany.recruiterList.split(',').map((item) => item.trim()),
+        recruiterList: newCompany.recruiterList
+          .split(',')
+          .map((item) => {
+            const [name, linkedin] = item.trim().split('|'); // Split recruiter name and LinkedIn URL using "|"
+            return { name: name.trim(), linkedin: linkedin?.trim() || '' }; // Return formatted recruiter object
+          }),
       };
       await addDoc(collection(db, 'companies'), formattedCompany);
 
@@ -97,7 +105,7 @@ function CompanyOverviews() {
           Company Overviews
         </Typography>
         <Typography variant="h6" color="textSecondary">
-          Learn more about companies, their culture, tech stack, and connect with alumni.
+          Learn more about companies, their culture, and recruiters.
         </Typography>
         <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mt: 2 }}>
           Add Company
@@ -114,18 +122,28 @@ function CompanyOverviews() {
                   <Typography variant="h5" component="div" gutterBottom>
                     {company.name}
                   </Typography>
+
+                  {/* Recruiters */}
                   <Typography variant="body2" color="textSecondary">
-                    Tech Stack: {company.techStack.join(', ')}
+                    Recruiters:
+                    {(Array.isArray(company.recruiterList) ? company.recruiterList : []).map((recruiter, index) => (
+                      <span key={index} style={{ marginLeft: 5 }}>
+                        {recruiter.name}
+                      </span>
+                    ))}
                   </Typography>
+
                   <Typography variant="body2" color="textSecondary">
-                    Recruiters: {company.recruiterList?.join(', ')}
+                    Perks: {company.payAndPerks}
                   </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Pay and Perks: {company.payAndPerks}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Employee Reviews: {company.employeeReviews}
-                  </Typography>
+
+                  {/* Star-based Employee Reviews */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                    <Typography variant="body2" color="textSecondary" sx={{ mr: 1 }}>
+                      Employee Reviews:
+                    </Typography>
+                    <Rating value={company.employeeReviews || 3} readOnly size="small" />
+                  </Box>
                 </CardContent>
               </CardActionArea>
             </Card>
@@ -137,11 +155,42 @@ function CompanyOverviews() {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Company</DialogTitle>
         <DialogContent>
-          <TextField margin="dense" name="name" label="Company Name" type="text" fullWidth variant="standard" value={newCompany.name} onChange={handleChange} />
-          <TextField margin="dense" name="techStack" label="Tech Stack" type="text" fullWidth variant="standard" value={newCompany.techStack} onChange={handleChange} />
-          <TextField margin="dense" name="recruiterList" label="Recruiters" type="text" fullWidth variant="standard" value={newCompany.recruiterList} onChange={handleChange} />
-          <TextField margin="dense" name="payAndPerks" label="Pay and Perks" type="text" fullWidth variant="standard" value={newCompany.payAndPerks} onChange={handleChange} />
-          <TextField margin="dense" name="employeeReviews" label="Employee Reviews" type="text" fullWidth variant="standard" value={newCompany.employeeReviews} onChange={handleChange} />
+          <TextField
+            margin="dense"
+            name="name"
+            label="Company Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newCompany.name}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="recruiterList"
+            label="Recruiters (Format: Name|LinkedIn, Name|LinkedIn)"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newCompany.recruiterList}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="payAndPerks"
+            label="Perks"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newCompany.payAndPerks}
+            onChange={handleChange}
+          />
+
+          {/* Star rating input for employee reviews */}
+          <Typography component="legend" sx={{ mt: 2 }}>
+            Employee Reviews
+          </Typography>
+          <Rating name="employeeReviews" value={newCompany.employeeReviews} onChange={handleRatingChange} size="large" />
 
           {/* File Input for Icon */}
           <Button variant="contained" component="label" sx={{ mt: 2 }}>

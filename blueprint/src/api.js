@@ -3,6 +3,22 @@ import { db } from "./firebase";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage
 import { v4 as uuidv4 } from "uuid";
 
+// Function to fetch LeetCode problems tagged with a specific company
+export async function getLeetCodeProblemsByCompany(companyName) {
+  try {
+    const q = query(collection(db, "problems"), where("company_tags", "array-contains", companyName)); // Query for problems tagged with the company
+    const querySnapshot = await getDocs(q);
+    const problems = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return problems; // Return the problems tagged with the company
+  } catch (error) {
+    console.error("Error fetching LeetCode problems by company:", error);
+    return [];
+  }
+}
+
 // Scoring functions
 function getDifficultyScore(difficulty, prepLevel) {
   const scores = {

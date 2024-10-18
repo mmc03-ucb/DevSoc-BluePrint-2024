@@ -9,14 +9,18 @@ import {
   Box,
   Button,
   Avatar,
+  CircularProgress,
 } from '@mui/material';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { db } from '../firebase';
+import { getLeetCodeProblemsByCompany } from '../api';  // Import the function for LeetCode problems
 
 function CompanyDetails() {
   const { id } = useParams(); // Get company ID from URL
   const [company, setCompany] = useState(null);
   const [alumniData, setAlumniData] = useState([]);
+  const [problems, setProblems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -24,6 +28,10 @@ function CompanyDetails() {
       const companySnap = await getDoc(companyDoc);
       if (companySnap.exists()) {
         setCompany({ id: companySnap.id, ...companySnap.data() });
+
+        // Fetch LeetCode problems for this company
+        const companyProblems = await getLeetCodeProblemsByCompany(companySnap.data().name);
+        setProblems(companyProblems);
       }
     };
 
@@ -33,13 +41,19 @@ function CompanyDetails() {
       setAlumniData(alumniList);
     };
 
-    fetchCompany();
-    fetchAlumni();
+    // Fetch company and alumni data
+    Promise.all([fetchCompany(), fetchAlumni()])
+      .then(() => setLoading(false))
+      .catch((error) => console.error("Error fetching data:", error));
   }, [id]);
 
   const getCompanyAlumni = () => {
     return alumniData.filter((alumni) => alumni.company === company?.name);
   };
+
+  if (loading) {
+    return <CircularProgress />;
+  }
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
@@ -50,13 +64,16 @@ function CompanyDetails() {
               {company.name}
             </Typography>
             <Typography variant="h6" color="textSecondary" gutterBottom>
-              Tech Stack: {company.techStack.join(', ')}
-            </Typography>
-            <Typography variant="h6" color="textSecondary" gutterBottom>
-              Recruiters: {company.recruiterList?.join(', ')}
+              {/* Display recruiter names only, without links */}
+              Recruiters: {company.recruiterList?.map((recruiter, index) => (
+                <span key={index}>
+                  {recruiter.name}
+                  {index < company.recruiterList.length - 1 && ', '}
+                </span>
+              ))}
             </Typography>
             <Typography variant="body1" gutterBottom>
-              Pay and Perks: {company.payAndPerks}
+              Perks: {company.payAndPerks}
             </Typography>
             <Typography variant="body1" gutterBottom>
               Employee Reviews: {company.employeeReviews}
@@ -113,6 +130,35 @@ function CompanyDetails() {
                 </Card>
               </Grid>
             ))}
+          </Grid>
+
+          {/* LeetCode Problems Section */}
+          <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+            LeetCode Problems Tagged with {company.name}
+          </Typography>
+          <Grid container spacing={4}>
+            {problems.length > 0 ? (
+              problems.map((problem) => (
+                <Grid item xs={12} sm={6} md={4} key={problem.id}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="h6">{problem.title}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Difficulty: {problem.difficulty}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Frequency: {problem.frequency}
+                      </Typography>
+                      <a href={problem.url} target="_blank" rel="noopener noreferrer">
+                        View Problem
+                      </a>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            ) : (
+              <Typography>No LeetCode problems found for {company.name}.</Typography>
+            )}
           </Grid>
         </Box>
       ) : (

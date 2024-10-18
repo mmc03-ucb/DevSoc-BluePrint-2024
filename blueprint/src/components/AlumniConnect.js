@@ -167,126 +167,125 @@ function AlumniConnect() {
 
       {/* Signup Form Modal */}
       <Modal open={showSignupForm} onClose={() => setShowSignupForm(false)}>
-  <Box
-    sx={{
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: { xs: '90%', sm: '80%', md: '60%', lg: '40%' },  // Responsive width
-      maxHeight: '90vh',  // Max height to avoid overflow
-      overflowY: 'auto',  // Enable scrolling if content exceeds max height
-      padding: 4,
-      backgroundColor: 'white',
-      boxShadow: 3,
-      borderRadius: 2,
-    }}
-  >
-    <Typography variant="h5" component="h2" gutterBottom align="center" sx={{ color: 'primary.main' }}>
-      Alumni Signup
-    </Typography>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '90%', sm: '80%', md: '60%', lg: '40%' },  // Responsive width
+            maxHeight: '90vh',  // Max height to avoid overflow
+            overflowY: 'auto',  // Enable scrolling if content exceeds max height
+            padding: 4,
+            backgroundColor: 'white',
+            boxShadow: 3,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h5" component="h2" gutterBottom align="center" sx={{ color: 'primary.main' }}>
+            Alumni Signup
+          </Typography>
 
-    <form onSubmit={handleSubmit}>
-      <TextField
-        label="Name"
-        name="name"
-        value={alumniData.name}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
-        required
-        variant="outlined"
-      />
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Name"
+              name="name"
+              value={alumniData.name}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              required
+              variant="outlined"
+            />
 
-      <TextField
-        label="Email"
-        name="email"
-        value={alumniData.email}
-        onChange={handleChange}
-        error={!!errors.email}
-        helperText={errors.email}
-        fullWidth
-        margin="normal"
-        required
-        variant="outlined"
-      />
+            <TextField
+              label="Email"
+              name="email"
+              value={alumniData.email}
+              onChange={handleChange}
+              error={!!errors.email}
+              helperText={errors.email}
+              fullWidth
+              margin="normal"
+              required
+              variant="outlined"
+            />
 
-      <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
-        <Switch
-          checked={alumniData.showEmail}
-          onChange={() => setAlumniData({ ...alumniData, showEmail: !alumniData.showEmail })}
-          name="showEmail"
-        />
-        <Typography variant="body2">Show Email</Typography>
-      </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
+              <Switch
+                checked={alumniData.showEmail}
+                onChange={() => setAlumniData({ ...alumniData, showEmail: !alumniData.showEmail })}
+                name="showEmail"
+              />
+              <Typography variant="body2">Show Email</Typography>
+            </Box>
 
-      <TextField
-        label="Company"
-        name="company"
-        value={alumniData.company}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
-        required
-        variant="outlined"
-      />
+            <TextField
+              label="Company"
+              name="company"
+              value={alumniData.company}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              required
+              variant="outlined"
+            />
 
-      <TextField
-        label="Advice"
-        name="advice"
-        value={alumniData.advice}
-        onChange={handleChange}
-        fullWidth
-        multiline
-        rows={4}
-        margin="normal"
-        variant="outlined"
-      />
+            <TextField
+              label="Advice"
+              name="advice"
+              value={alumniData.advice}
+              onChange={handleChange}
+              fullWidth
+              multiline
+              rows={4}
+              margin="normal"
+              variant="outlined"
+            />
 
-      <Button variant="contained" component="label" fullWidth sx={{ marginTop: 2 }}>
-        Upload Picture
-        <input type="file" hidden onChange={handleFileUpload} />
-      </Button>
+            <Button variant="contained" component="label" fullWidth sx={{ marginTop: 2 }}>
+              Upload Picture
+              <input type="file" hidden onChange={handleFileUpload} />
+            </Button>
 
-      <TextField
-        label="Calendly Link"
-        name="calendlyLink"
-        value={alumniData.calendlyLink}
-        onChange={handleChange}
-        error={!!errors.calendlyLink}
-        helperText={errors.calendlyLink}
-        fullWidth
-        margin="normal"
-        variant="outlined"
-      />
-      <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
-        <Switch
-          checked={alumniData.showCalendly}
-          onChange={() => setAlumniData({ ...alumniData, showCalendly: !alumniData.showCalendly })}
-          name="showCalendly"
-        />
-        <Typography variant="body2">Show Calendly Link</Typography>
-      </Box>
+            <TextField
+              label="Calendly Link"
+              name="calendlyLink"
+              value={alumniData.calendlyLink}
+              onChange={handleChange}
+              error={!!errors.calendlyLink}
+              helperText={errors.calendlyLink}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+            />
+            <Box sx={{ display: 'flex', alignItems: 'center', marginY: 2 }}>
+              <Switch
+                checked={alumniData.showCalendly}
+                onChange={() => setAlumniData({ ...alumniData, showCalendly: !alumniData.showCalendly })}
+                name="showCalendly"
+              />
+              <Typography variant="body2">Show Calendly Link</Typography>
+            </Box>
 
-      <TextField
-        label="LinkedIn Link"
-        name="linkedinLink"
-        value={alumniData.linkedinLink}
-        onChange={handleChange}
-        error={!!errors.linkedinLink}
-        helperText={errors.linkedinLink}
-        fullWidth
-        margin="normal"
-        variant="outlined"
-      />
+            <TextField
+              label="LinkedIn Link"
+              name="linkedinLink"
+              value={alumniData.linkedinLink}
+              onChange={handleChange}
+              error={!!errors.linkedinLink}
+              helperText={errors.linkedinLink}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+            />
 
-      <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 3 }}>
-        Submit
-      </Button>
-    </form>
-  </Box>
-</Modal>
-
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 3 }}>
+              Submit
+            </Button>
+          </form>
+        </Box>
+      </Modal>
 
       {/* Alumni Grid */}
       <Grid container spacing={4} sx={{ marginTop: 4 }}>
@@ -298,7 +297,7 @@ function AlumniConnect() {
                 borderRadius: 2,
                 boxShadow: 3,
                 textAlign: 'center',
-                backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#f9f9f9',  // Adjust background for dark mode
+                backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#f9f9f9',
                 transition: 'transform 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.05)',
@@ -325,7 +324,8 @@ function AlumniConnect() {
                   {alumni.email}
                 </Typography>
               )}
-              {alumni.showCalendly && (
+              {/* Conditionally render Book a Chat button */}
+              {alumni.showCalendly && alumni.calendlyLink && (
                 <Button
                   variant="outlined"
                   href={alumni.calendlyLink}

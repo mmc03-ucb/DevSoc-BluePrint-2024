@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
-import { TextField, Button, Grid, Card, CardContent, Typography, Container, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Box } from '@mui/material';
+import { TextField, Button, Grid, Card, CardContent, Typography, Container, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Box, Select, Checkbox, ListItemText } from '@mui/material';
 import { Timestamp } from 'firebase/firestore';
 
 function JobBoard() {
   const [jobs, setJobs] = useState([]);
-  const [workRightsFilter, setWorkRightsFilter] = useState('');  // Filter by work rights
+  const [workRightsFilter, setWorkRightsFilter] = useState([]);  // Filter by work rights (now multiple)
   const [companyFilter, setCompanyFilter] = useState('');        // Filter by company
   const [companies, setCompanies] = useState([]);                // List of companies for filter dropdown
   const [companyLogos, setCompanyLogos] = useState({});          // Store company logos mapped by company name
@@ -19,10 +19,12 @@ function JobBoard() {
     title: '',
     company: '',
     description: '',
-    workRights: '',
+    workRights: [],  // Allow multiple work rights
     expiryDate: '',
     applyUrl: '',
   });
+
+  const workRightsOptions = ['Citizen', 'Work Visa', 'Permanent Resident', 'Student Visa'];
 
   useEffect(() => {
     const fetchJobsAndCompanies = async () => {
@@ -48,7 +50,7 @@ function JobBoard() {
   }, []);
 
   const handleWorkRightsFilterChange = (e) => {
-    setWorkRightsFilter(e.target.value);
+    setWorkRightsFilter(e.target.value);  // Update work rights filter with multiple values
   };
 
   const handleCompanyFilterChange = (e) => {
@@ -62,7 +64,7 @@ function JobBoard() {
       title: '',
       company: '',
       description: '',
-      workRights: '',
+      workRights: [],
       expiryDate: '',
       applyUrl: '',
     });
@@ -76,6 +78,10 @@ function JobBoard() {
   const handleJobChange = (e) => {
     const { name, value } = e.target;
     setNewJob((prevJob) => ({ ...prevJob, [name]: value }));
+  };
+
+  const handleWorkRightsChange = (e) => {
+    setNewJob((prevJob) => ({ ...prevJob, workRights: e.target.value }));
   };
 
   const handleSubmitJob = async () => {
@@ -155,7 +161,7 @@ function JobBoard() {
   // Apply filters based on work rights and company
   const filteredJobs = jobs.filter((job) => {
     return (
-      (!workRightsFilter || job.workRights === workRightsFilter) &&
+      (workRightsFilter.length === 0 || workRightsFilter.some((right) => job.workRights.includes(right))) &&
       (!companyFilter || job.company === companyFilter)
     );
   });
@@ -179,20 +185,22 @@ function JobBoard() {
       {/* Filters Section */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6}>
-          <TextField
-            select
+          <Select
+            multiple
             fullWidth
             label="Filter by Work Rights"
             value={workRightsFilter}
             onChange={handleWorkRightsFilterChange}
+            renderValue={(selected) => selected.join(', ')}  // Display selected work rights as a string
             variant="outlined"
           >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="Citizen">Citizen</MenuItem>
-            <MenuItem value="Work Visa">Work Visa</MenuItem>
-            <MenuItem value="Permanent Resident">Permanent Resident</MenuItem>
-            <MenuItem value="Student Visa">Student Visa</MenuItem>
-          </TextField>
+            {workRightsOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                <Checkbox checked={workRightsFilter.indexOf(option) > -1} />
+                <ListItemText primary={option} />
+              </MenuItem>
+            ))}
+          </Select>
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -230,7 +238,7 @@ function JobBoard() {
                   {job.company}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Work Rights: {job.workRights}
+                  Work Rights: {job.workRights.join(', ')}  {/* Display multiple work rights */}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
                   {job.description}
@@ -309,21 +317,23 @@ function JobBoard() {
             value={newJob.description}
             onChange={handleJobChange}
           />
-          <TextField
-            select
+          <Select
+            multiple
             margin="dense"
             name="workRights"
-            label="Work Rights"
             fullWidth
             variant="standard"
             value={newJob.workRights}
-            onChange={handleJobChange}
+            onChange={handleWorkRightsChange}
+            renderValue={(selected) => selected.join(', ')}
           >
-            <MenuItem value="Citizen">Citizen</MenuItem>
-            <MenuItem value="Work Visa">Work Visa</MenuItem>
-            <MenuItem value="Permanent Resident">Permanent Resident</MenuItem>
-            <MenuItem value="Student Visa">Student Visa</MenuItem>
-          </TextField>
+            {workRightsOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                <Checkbox checked={newJob.workRights.indexOf(option) > -1} />
+                <ListItemText primary={option} />
+              </MenuItem>
+            ))}
+          </Select>
           <TextField
             margin="dense"
             name="expiryDate"
