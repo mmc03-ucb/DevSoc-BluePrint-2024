@@ -327,67 +327,72 @@ function AlumniConnect() {
 
       {/* Alumni Grid */}
       <Grid container spacing={4} sx={{ marginTop: 4 }}>
-        {filteredAlumni.map((alumni, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Box
-              sx={{
-                padding: 3,
-                borderRadius: 2,
-                boxShadow: 3,
-                textAlign: 'center',
-                backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#f9f9f9',
-                transition: 'transform 0.3s ease',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-                },
-              }}
-            >
-              <Avatar
-                src={alumni.picture || ''}
-                alt={alumni.name}
-                sx={{ width: 80, height: 80, margin: '0 auto', marginBottom: 2 }}
-              />
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
-                {alumni.name}
-              </Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.text.secondary, marginBottom: 1 }}>
-                {alumni.company}
-              </Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.text.primary, marginBottom: 2 }}>
-                {alumni.advice}
-              </Typography>
-              {alumni.showEmail && (
-                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
-                  {alumni.email}
-                </Typography>
-              )}
-              {alumni.showCalendly && (
-                <Button
-                  variant="outlined"
-                  href={alumni.calendlyLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ marginTop: 1 }}
-                >
-                  Book a Chat
-                </Button>
-              )}
-              {alumni.linkedinLink && (
-                <Button
-                  variant="outlined"
-                  href={alumni.linkedinLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ marginTop: 1 }}
-                >
-                  View LinkedIn
-                </Button>
-              )}
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
+  {filteredAlumni.map((alumni, index) => (
+    <Grid item xs={12} sm={6} md={4} key={index}>
+      <Box
+        sx={{
+          padding: 3,
+          borderRadius: 2,
+          boxShadow: 3,
+          textAlign: 'center',
+          backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#f9f9f9',
+          transition: 'transform 0.3s ease',
+          height: '100%', // Ensure all cards take full height
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between', // Spread content evenly
+          '&:hover': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+          },
+        }}
+      >
+        <Avatar
+          src={alumni.picture || ''}
+          alt={alumni.name}
+          sx={{ width: 80, height: 80, margin: '0 auto', marginBottom: 2 }}
+        />
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
+          {alumni.name}
+        </Typography>
+        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, marginBottom: 1 }}>
+          {alumni.company}
+        </Typography>
+        <Typography variant="body2" sx={{ color: theme.palette.text.primary, marginBottom: 2 }}>
+          {alumni.advice}
+        </Typography>
+        {alumni.showEmail && (
+          <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+            {alumni.email}
+          </Typography>
+        )}
+        {alumni.showCalendly && (
+          <Button
+            variant="outlined"
+            href={alumni.calendlyLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ marginTop: 1 }}
+          >
+            Book a Chat
+          </Button>
+        )}
+        {alumni.linkedinLink && (
+          <Button
+            variant="outlined"
+            href={alumni.linkedinLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ marginTop: 1 }}
+          >
+            View LinkedIn
+          </Button>
+        )}
+      </Box>
+    </Grid>
+  ))}
+</Grid>
+
     </Container>
   );
 }
