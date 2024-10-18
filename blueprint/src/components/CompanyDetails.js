@@ -10,10 +10,13 @@ import {
   Button,
   Avatar,
   CircularProgress,
+  IconButton,
+  Divider,
 } from '@mui/material';
+import { Email as EmailIcon, LinkedIn as LinkedInIcon } from '@mui/icons-material';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { db } from '../firebase';
-import { getLeetCodeProblemsByCompany } from '../api';  // Import the function for LeetCode problems
+import { getLeetCodeProblemsByCompany } from '../api'; // Import the function for LeetCode problems
 
 function CompanyDetails() {
   const { id } = useParams(); // Get company ID from URL
@@ -44,7 +47,7 @@ function CompanyDetails() {
     // Fetch company and alumni data
     Promise.all([fetchCompany(), fetchAlumni()])
       .then(() => setLoading(false))
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => console.error('Error fetching data:', error));
   }, [id]);
 
   const getCompanyAlumni = () => {
@@ -64,40 +67,52 @@ function CompanyDetails() {
               {company.name}
             </Typography>
             <Typography variant="h6" color="textSecondary" gutterBottom>
-  {/* Hyperlink the recruiter names to their LinkedIn profile */}
-  Recruiters: {company.recruiterList?.map((recruiter, index) => (
-    <span key={index}>
-      {recruiter.linkedin ? (
-        <a href={recruiter.linkedin} target="_blank" rel="noopener noreferrer">
-          {recruiter.name}
-        </a>
-      ) : (
-        recruiter.name
-      )}
-      {index < company.recruiterList.length - 1 && ', '}
-    </span>
-  ))}
-</Typography>
+              {/* Hyperlink the recruiter names to their LinkedIn profile */}
+              Recruiters:{' '}
+              {company.recruiterList?.map((recruiter, index) => (
+                <span key={index}>
+                  {recruiter.linkedin ? (
+                    <a
+                      href={recruiter.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      {recruiter.name}
+                      <LinkedInIcon sx={{ fontSize: 18, ml: 0.5 }} />
+                    </a>
+                  ) : (
+                    recruiter.name
+                  )}
+                  {index < company.recruiterList.length - 1 && ', '}
+                </span>
+              ))}
+            </Typography>
 
-<Typography variant="body1" color="textSecondary" gutterBottom>{company.email && (
-  <Typography variant="body1" color="textSecondary" gutterBottom>
-    Email: <a href={`mailto:${company.email}`} target="_blank" rel="noopener noreferrer">
-      {company.email}
-    </a>
-  </Typography>
-)}
-</Typography>
+            {company.email && (
+              <Box display="flex" justifyContent="center" alignItems="center" sx={{ mt: 1 }}>
+                <EmailIcon sx={{ mr: 1 }} />
+                <Typography variant="body1" color="textSecondary">
+                  <a href={`mailto:${company.email}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {company.email}
+                  </a>
+                </Typography>
+              </Box>
+            )}
 
-            <Typography variant="body1" gutterBottom>
+            <Typography variant="body1" sx={{ mt: 2 }}>
               Perks: {company.payAndPerks}
             </Typography>
-            <Typography variant="body1" gutterBottom>
-              Alumni Rating: {company.employeeReviews}
+
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              Alumni Rating: {company.employeeReviews} stars
             </Typography>
           </Box>
 
+          <Divider sx={{ my: 4 }} />
+
           {/* Alumni Section */}
-          <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+          <Typography variant="h5" sx={{ mb: 2 }}>
             Alumni
           </Typography>
           <Grid container spacing={4}>
@@ -110,7 +125,7 @@ function CompanyDetails() {
                   <Avatar
                     src={alumni.picture || ''}
                     alt={alumni.name}
-                    sx={{ width: 80, height: 80, marginBottom: 2 }}
+                    sx={{ width: 80, height: 80, mb: 2 }}
                   />
                   <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                     {alumni.name}
@@ -148,8 +163,10 @@ function CompanyDetails() {
             ))}
           </Grid>
 
+          <Divider sx={{ my: 4 }} />
+
           {/* LeetCode Problems Section */}
-          <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+          <Typography variant="h5" sx={{ mb: 2 }}>
             LeetCode Problems Tagged with {company.name}
           </Typography>
           <Grid container spacing={4}>
