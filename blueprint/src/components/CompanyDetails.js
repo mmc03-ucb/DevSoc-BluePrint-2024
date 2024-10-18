@@ -64,19 +64,35 @@ function CompanyDetails() {
               {company.name}
             </Typography>
             <Typography variant="h6" color="textSecondary" gutterBottom>
-              {/* Display recruiter names only, without links */}
-              Recruiters: {company.recruiterList?.map((recruiter, index) => (
-                <span key={index}>
-                  {recruiter.name}
-                  {index < company.recruiterList.length - 1 && ', '}
-                </span>
-              ))}
-            </Typography>
+  {/* Hyperlink the recruiter names to their LinkedIn profile */}
+  Recruiters: {company.recruiterList?.map((recruiter, index) => (
+    <span key={index}>
+      {recruiter.linkedin ? (
+        <a href={recruiter.linkedin} target="_blank" rel="noopener noreferrer">
+          {recruiter.name}
+        </a>
+      ) : (
+        recruiter.name
+      )}
+      {index < company.recruiterList.length - 1 && ', '}
+    </span>
+  ))}
+</Typography>
+
+<Typography variant="body1" color="textSecondary" gutterBottom>{company.email && (
+  <Typography variant="body1" color="textSecondary" gutterBottom>
+    Email: <a href={`mailto:${company.email}`} target="_blank" rel="noopener noreferrer">
+      {company.email}
+    </a>
+  </Typography>
+)}
+</Typography>
+
             <Typography variant="body1" gutterBottom>
               Perks: {company.payAndPerks}
             </Typography>
             <Typography variant="body1" gutterBottom>
-              Employee Reviews: {company.employeeReviews}
+              Alumni Rating: {company.employeeReviews}
             </Typography>
           </Box>
 

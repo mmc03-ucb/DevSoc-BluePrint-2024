@@ -380,29 +380,53 @@ function DynamicLeetCodeList() {
         </List>
       )}
       {/* Display Company Overview if available */}
-      {companyOverview && (
-        <Card sx={{ mt: 4 }}>
-          <CardActionArea component={Link} to={`/company-details/${companyOverview.id}`}>
-            <CardContent>
-              <Typography variant="h5" component="h3">
-                {companyOverview.name}
-              </Typography>
-              <Typography variant="body1">
-                Tech Stack: {companyOverview.techStack.join(', ')}
-              </Typography>
-              <Typography variant="body1">
-                Recruiters: {companyOverview.recruiterList?.join(', ')}
-              </Typography>
-              <Typography variant="body1">
-                Pay and Perks: {companyOverview.payAndPerks}
-              </Typography>
-              <Typography variant="body1">
-                Employee Reviews: {companyOverview.employeeReviews}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-      )}
+     {companyOverview && (
+  <Card sx={{ mt: 4 }}>
+    <CardActionArea component={Link} to={`/company-details/${companyOverview.id}`}>
+      <CardContent>
+        <Typography variant="h5" component="h3">
+          {companyOverview.name}
+        </Typography>
+
+        {/* Display recruiters if recruiterList exists */}
+        <Typography variant="body1">
+          Recruiters:
+        </Typography>
+        {companyOverview.recruiterList && companyOverview.recruiterList.length > 0 ? (
+          <List>
+            {companyOverview.recruiterList.map((recruiter, index) => (
+              <ListItem key={index}>
+                <ListItemText
+                  primary={recruiter.name}
+                />
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Typography variant="body2">No recruiters available</Typography>
+        )}
+
+        <Typography variant="body1">
+          Pay and Perks: {companyOverview.payAndPerks || 'Not available'}
+        </Typography>
+        
+        {/* Display employee reviews */}
+        <Typography variant="body1">
+          Alumni Rating: {companyOverview.employeeReviews || 'Not available'}
+        </Typography>
+
+        {/* Display company icon if available */}
+        {companyOverview.icon && (
+          <img
+            src={companyOverview.icon}
+            alt={`${companyOverview.name} icon`}
+            style={{ width: '100px', height: '100px', marginTop: '10px' }}
+          />
+        )}
+      </CardContent>
+    </CardActionArea>
+  </Card>
+)}
     </Container>
   );
 }

@@ -152,13 +152,14 @@ function CompanyOverviews() {
 
                   {/* Recruiters */}
                   <Typography variant="body2" color="textSecondary">
-                    Recruiters:
-                    {(Array.isArray(company.recruiterList) ? company.recruiterList : []).map((recruiter, index) => (
-                      <span key={index} style={{ marginLeft: 5 }}>
-                        {recruiter.name}
-                      </span>
-                    ))}
-                  </Typography>
+  Recruiters:
+  {(Array.isArray(company.recruiterList) ? company.recruiterList : []).map((recruiter, index) => (
+    <span key={index} style={{ marginLeft: 5 }}>
+      {recruiter.name.includes('https') ? '' : recruiter.name}
+    </span>
+  ))}
+</Typography>
+
 
                   <Typography variant="body2" color="textSecondary">
                     Perks: {company.payAndPerks}
@@ -167,7 +168,7 @@ function CompanyOverviews() {
                   {/* Star-based Employee Reviews */}
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                     <Typography variant="body2" color="textSecondary" sx={{ mr: 1 }}>
-                      Employee Reviews:
+                      Alumni Rating:
                     </Typography>
                     <Rating value={company.employeeReviews || 3} readOnly size="small" />
                   </Box>
