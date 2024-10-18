@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
+import { Typography, Container, TextField, Button, MenuItem, List, ListItem, ListItemText, CircularProgress, Card, CardContent, CardActionArea } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { getLeetCodeProblems, updateProblemCompletionStatus, findProblemByURL, updateProblemContribution, addNewProblem } from '../api'; // Import the Firestore API function
+import { getLeetCodeProblems, updateProblemCompletionStatus, findProblemByURL, updateProblemContribution, addNewProblem, getCompanyOverview } from '../api'; // Import the Firestore API function
 import { Checkbox } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 function DynamicLeetCodeList() {
   const [interviewDate, setInterviewDate] = useState(null);  // Interview date from calendar
@@ -20,6 +21,7 @@ function DynamicLeetCodeList() {
   const [contributeDifficulty, setContributeDifficulty] = useState(''); // Add difficulty field
   const [showDifficultyField, setShowDifficultyField] = useState(false);
   const [contributeMessage, setContributeMessage] = useState(''); // Message for contribution feedback
+  const [companyOverview, setCompanyOverview] = useState(null);
 
   // Fetch all problems on initial load
   useEffect(() => {
@@ -73,6 +75,11 @@ function DynamicLeetCodeList() {
       const fetchedProblems = await getLeetCodeProblems(timeLeft, prepLevel, targetCompany);
       setProblems(fetchedProblems); // Set the personalized problems to state
       setShowForm(false); // Hide the form after submission
+
+      if (targetCompany) {
+        const overview = await getCompanyOverview(targetCompany); // Fetch the company overview data
+        setCompanyOverview(overview || null); // Set the company overview if exists, otherwise set to null
+      }
     } catch (error) {
       console.error('Error fetching problems:', error);
     } finally {
@@ -370,6 +377,30 @@ function DynamicLeetCodeList() {
             </ListItem>
           ))}
         </List>
+      )}
+      {/* Display Company Overview if available */}
+      {companyOverview && (
+        <Card sx={{ mt: 4 }}>
+          <CardActionArea component={Link} to={`/company-details/${companyOverview.id}`}>
+            <CardContent>
+              <Typography variant="h5" component="h3">
+                {companyOverview.name}
+              </Typography>
+              <Typography variant="body1">
+                Tech Stack: {companyOverview.techStack.join(', ')}
+              </Typography>
+              <Typography variant="body1">
+                Recruiters: {companyOverview.recruiterList?.join(', ')}
+              </Typography>
+              <Typography variant="body1">
+                Pay and Perks: {companyOverview.payAndPerks}
+              </Typography>
+              <Typography variant="body1">
+                Employee Reviews: {companyOverview.employeeReviews}
+              </Typography>
+            </CardContent>
+          </CardActionArea>
+        </Card>
       )}
     </Container>
   );
