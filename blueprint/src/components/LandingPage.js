@@ -66,13 +66,23 @@ function LandingPage() {
             variant="h2"
             component="h1"
             gutterBottom
-            sx={{ color: theme.palette.mode === 'dark' ? '#fff' : '#000' }} // Use theme to determine text color
+            sx={{ 
+              color: theme.palette.mode === 'dark' ? '#fff' : '#000',
+              fontWeight: 700,  // Make the heading bold
+              letterSpacing: 1.2, // Add slight letter spacing for a modern look
+              fontSize: '3rem', // Adjust the size for better readability
+            }}
           >
             Welcome to Interview Prep Hub
           </Typography>
           <Typography
-            variant="h5"
-            sx={{ color: theme.palette.mode === 'dark' ? '#fff' : '#000' }} // Use theme to determine text color
+            variant="h6" // Use a smaller variant for better hierarchy
+            sx={{ 
+              color: theme.palette.mode === 'dark' ? '#fff' : '#000',
+              fontWeight: 400, // Lighten the subtitle
+              letterSpacing: 0.8, // Add subtle spacing to the subtitle
+              fontSize: '1.2rem', // Adjust size for better balance
+            }}
           >
             Your one-stop platform to ace interviews and streamline your job search
           </Typography>
@@ -90,7 +100,16 @@ function LandingPage() {
                     <IconButton disableRipple className={classes.cardIcon}>
                       {feature.icon}
                     </IconButton>
-                    <Typography variant="h5" component="div" gutterBottom>
+                    <Typography 
+                      variant="h6" // Use h6 for slightly smaller text on cards
+                      component="div" 
+                      gutterBottom
+                      sx={{ 
+                        fontWeight: 500, // Medium weight for emphasis
+                        fontSize: '1.2rem', // Smaller size for card titles
+                        letterSpacing: 0.5, // Keep consistent with modern look
+                      }}
+                    >
                       {feature.name}
                     </Typography>
                   </CardContent>
