@@ -1,4 +1,4 @@
-# HireVerse - DevSoc Blueprint Hackathon 2024
+# HireVerse - Special Mention in DevSoc's Blueprint Hackathon 2024!
 
 **Team:**  
 - **Muqueet Mohsen Chowdhury**  
